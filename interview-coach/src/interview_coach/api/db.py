@@ -11,7 +11,7 @@ from typing import Literal
 
 from pydantic import BaseModel
 
-ReportStatus = Literal["pending", "ready", "failed"]
+ReportStatus = Literal["pending", "ready", "failed", "empty"]
 
 _SCHEMA = """
 CREATE TABLE IF NOT EXISTS sessions (

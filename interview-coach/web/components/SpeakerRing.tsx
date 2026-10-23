@@ -1,6 +1,7 @@
 "use client";
 
 import type { AgentState } from "@livekit/components-react";
+import { describeAgentState } from "@/lib/agentState";
 
 const SPEAKING_THRESHOLD = 0.06;
 
@@ -18,7 +19,7 @@ export function SpeakerRing({
     state === "speaking" ? "interviewer" : state === "thinking" ? "thinking" : candidateTalking ? "candidate" : "idle";
   const level = who === "interviewer" ? agentVolume : who === "candidate" ? micVolume : 0;
 
-  const { label, hint } = describe(state, candidateTalking);
+  const { label, hint } = describeAgentState(state, candidateTalking);
   return (
     <>
       <div
@@ -33,21 +34,4 @@ export function SpeakerRing({
       {hint && <p className="ring-hint">{hint}</p>}
     </>
   );
-}
-
-function describe(state: AgentState, candidateTalking: boolean): { label: string; hint?: string } {
-  switch (state) {
-    case "speaking":
-      return { label: "Interviewer is speaking", hint: "You can interrupt if you need to." };
-    case "thinking":
-      return { label: "Interviewer is thinking" };
-    case "listening":
-      return candidateTalking
-        ? { label: "You're answering" }
-        : { label: "Your turn", hint: "Take your time. Pauses to think are fine." };
-    case "failed":
-      return { label: "The interviewer couldn't join", hint: "Check that the agent worker is running." };
-    default:
-      return { label: "Connecting to your interviewer…" };
-  }
 }

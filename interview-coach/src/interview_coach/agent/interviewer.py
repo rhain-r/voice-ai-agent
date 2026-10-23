@@ -40,6 +40,7 @@ class Interviewer(Agent):
         self._clock = clock
         self._index = -1
         self._finished = False
+        self._skipped: set[int] = set()
         self._stream_offset: float | None = None  # wall-clock seconds at STT time zero
 
     @property
@@ -50,8 +51,18 @@ class Interviewer(Agent):
     def total(self) -> int:
         return len(self._plan)
 
+    @property
+    def skipped(self) -> set[int]:
+        return set(self._skipped)
+
+    def mark_skipped(self) -> None:
+        if self._index >= 0:
+            self._skipped.add(self._index)
+
     async def advance_question(self) -> str:
         if self._index + 1 >= len(self._plan):
+            # The candidate's own questions at the end are not part of the last answer.
+            self._analytics.end_questions(self._clock())
             return NO_MORE_QUESTIONS
         self._index += 1
         question = self._plan[self._index]
@@ -103,6 +114,12 @@ class Interviewer(Agent):
         """Get the next interview question. Call it right after the greeting, and again once the
         current question and its follow-ups are done."""
         return await self.advance_question()
+
+    @function_tool
+    async def skip_question(self, context: RunContext) -> str:
+        """Record that the candidate declined to answer the current question."""
+        self.mark_skipped()
+        return "Marked as skipped. Say that's completely fine, then call next_question."
 
     @function_tool
     async def end_interview(

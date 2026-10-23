@@ -15,7 +15,7 @@ from pydantic import BaseModel, Field
 
 from interview_coach.config import API_REQUIRED, Settings, missing_keys, require
 from interview_coach.mcp_server.bank import rubric
-from interview_coach.scorecard.graph import ClaudeGrader, Grader, run_scorecard
+from interview_coach.scorecard.graph import ClaudeGrader, Grader, NothingToGrade, run_scorecard
 from interview_coach.scorecard.models import QAItem, SessionInfo
 
 from .db import Store
@@ -84,9 +84,13 @@ def create_app(
                 grader_factory(),
                 SessionInfo(role=setup["role"], level=setup["level"], style=setup["style"]),
                 payload.qa_items,
-                rubric(setup["style"]),
+                rubric,  # chosen per question: technical answers in a mixed interview get technical anchors
             )
             store.set_report(session_id, "ready", scorecard=scorecard.model_dump())
+        except NothingToGrade:
+            store.set_report(
+                session_id, "empty", error="The interview ended before any question was answered."
+            )
         except Exception as exc:  # the report must always reach a terminal state
             log.exception("scorecard failed for %s", session_id)
             store.set_report(session_id, "failed", error=f"{type(exc).__name__}: {exc}")

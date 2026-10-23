@@ -15,8 +15,11 @@ class QAItem(BaseModel):
     index: int
     question: str
     competency: str
-    transcript: str
+    transcript: str = Field(description="The candidate's words only")
     metrics: dict = Field(default_factory=dict)
+    style: str = "behavioral"
+    dialogue: str = Field(default="", description="Interviewer and candidate lines, follow-ups included")
+    skipped: bool = False
 
 
 class DimensionScores(BaseModel):

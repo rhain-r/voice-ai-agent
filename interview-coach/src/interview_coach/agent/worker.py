@@ -23,6 +23,7 @@ from interview_coach.agent.session_config import (
     CompletionGuard,
     completion_status,
     keyterms_for,
+    room_options,
     segment_qa,
     turn_handling,
     wait_until_quiet,
@@ -121,7 +122,12 @@ async def entrypoint(ctx: JobContext) -> None:
         payload = {
             "status": completion_status(asked=asked, total=interviewer.total, reason=reason),
             "transcript": transcript,
-            "qa_items": [item.model_dump() for item in segment_qa(plan, analytics, asked)],
+            "qa_items": [
+                item.model_dump()
+                for item in segment_qa(
+                    plan, analytics, asked, transcript=transcript, skipped=interviewer.skipped
+                )
+            ],
             "speech": _as_dict(analytics.session_metrics()),
             "latency": tracker.summary(),
         }
@@ -189,7 +195,7 @@ async def entrypoint(ctx: JobContext) -> None:
         if participant.identity.startswith("candidate-"):
             spawn(interviewer.finish("disconnected"))
 
-    await session.start(agent=interviewer, room=ctx.room)
+    await session.start(agent=interviewer, room=ctx.room, room_options=room_options())
 
 
 def _as_dict(metrics) -> dict:

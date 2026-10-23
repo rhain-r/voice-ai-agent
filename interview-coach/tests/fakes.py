@@ -60,16 +60,20 @@ class FakeGrader:
         self.per_index = per_index or {}
         self.fail = fail
         self.graded_indexes: list[int] = []
+        self.rubrics: dict[int, dict] = {}
         self.coach_calls = 0
+        self.coach_weakest: int | None = None
 
     async def grade(self, item, rubric, session):
         if self.fail:
             raise RuntimeError("grader exploded")
         self.graded_indexes.append(item.index)
+        self.rubrics[item.index] = rubric
         return grade(**self.per_index.get(item.index, {}))
 
-    async def coach(self, items, graded, session):
+    async def coach(self, items, graded, session, weakest_index):
         self.coach_calls += 1
+        self.coach_weakest = weakest_index
         return coaching()
 
 

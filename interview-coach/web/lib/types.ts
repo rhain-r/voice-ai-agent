@@ -83,7 +83,7 @@ export interface SpeechSummary {
 }
 
 export interface Report {
-  status: "in_progress" | "pending" | "ready" | "failed";
+  status: "in_progress" | "pending" | "ready" | "failed" | "empty";
   session: {
     id: string;
     created_at: number;

@@ -7,7 +7,8 @@ import { AnswerCard } from "@/components/AnswerCard";
 import { DIMENSION_LABEL, DimensionBars } from "@/components/DimensionBars";
 import { seconds } from "@/components/LatencyStrip";
 import { ApiError, getReport, retryReport } from "@/lib/api";
-import type { Dimension, Report } from "@/lib/types";
+import { reportView } from "@/lib/reportView";
+import type { Dimension, Report, SpeechSummary } from "@/lib/types";
 
 const POLL_MS = 2000;
 
@@ -35,7 +36,8 @@ export default function ReportPage() {
     void load();
   }, [load]);
 
-  const waiting = report?.status === "pending" || report?.status === "in_progress";
+  const view = report ? reportView(report) : null;
+  const waiting = view?.polling ?? false;
   useEffect(() => {
     if (!waiting) return;
     const timer = setInterval(load, POLL_MS);
@@ -54,7 +56,7 @@ export default function ReportPage() {
       </main>
     );
   }
-  if (!report) return null;
+  if (!report || !view) return null;
 
   const setup = report.session.setup;
   return (
@@ -62,10 +64,17 @@ export default function ReportPage() {
       <p className="muted">
         <Link href="/">New interview</Link>
       </p>
-      {waiting && <Waiting report={report} />}
-      {report.status === "failed" && <Failed report={report} onRetry={() => retryReport(id).then(load)} />}
-      {report.status === "ready" && report.scorecard && <Ready report={report} />}
-      {report.status !== "ready" && report.transcript.length > 0 && (
+      {view.headline === "waiting" && <Waiting report={report} />}
+      {view.headline === "failed" && <Failed report={report} onRetry={() => retryReport(id).then(load)} />}
+      {view.headline === "empty" && <Empty />}
+      {view.headline === "ready" && report.scorecard && <Ready report={report} />}
+      {view.showSpeech && view.headline !== "ready" && report.speech && (
+        <section className="section" aria-labelledby="sound-title">
+          <h2 id="sound-title">How you sounded</h2>
+          <SpeechFacts speech={report.speech} />
+        </section>
+      )}
+      {view.showTranscript && (
         <section className="section">
           <h2>Transcript</h2>
           <ol className="transcript" style={{ marginTop: "1rem" }}>
@@ -82,6 +91,33 @@ export default function ReportPage() {
         {setup.role}, {setup.level} level, {setup.style} questions.
       </p>
     </main>
+  );
+}
+
+function Empty() {
+  return (
+    <div className="narrow">
+      <h1>There was nothing to grade.</h1>
+      <p className="lede">
+        The interview ended before any question was answered, or every question was skipped.{" "}
+        <Link href="/">Start a new interview</Link> when you&apos;re ready.
+      </p>
+    </div>
+  );
+}
+
+function SpeechFacts({ speech }: { speech: SpeechSummary }) {
+  return (
+    <dl className="facts">
+      <dt>Pace</dt>
+      <dd>{Math.round(speech.avg_wpm)} words per minute</dd>
+      <dt>Filler words</dt>
+      <dd>{speech.fillers_per_min.toFixed(1)} per minute</dd>
+      <dt>Time to start</dt>
+      <dd>{speech.avg_thinking_time_s != null ? `${speech.avg_thinking_time_s.toFixed(1)} s on average` : "n/a"}</dd>
+      <dt>You talked</dt>
+      <dd>{Math.round(speech.talk_ratio * 100)}% of the time</dd>
+    </dl>
   );
 }
 
@@ -148,18 +184,7 @@ function Ready({ report }: { report: Report }) {
         {speech && (
           <section aria-labelledby="sound-title">
             <h2 id="sound-title">How you sounded</h2>
-            <dl className="facts">
-              <dt>Pace</dt>
-              <dd>{Math.round(speech.avg_wpm)} words per minute</dd>
-              <dt>Filler words</dt>
-              <dd>{speech.fillers_per_min.toFixed(1)} per minute</dd>
-              <dt>Time to start</dt>
-              <dd>
-                {speech.avg_thinking_time_s != null ? `${speech.avg_thinking_time_s.toFixed(1)} s on average` : "n/a"}
-              </dd>
-              <dt>You talked</dt>
-              <dd>{Math.round(speech.talk_ratio * 100)}% of the time</dd>
-            </dl>
+            <SpeechFacts speech={speech} />
           </section>
         )}
       </div>

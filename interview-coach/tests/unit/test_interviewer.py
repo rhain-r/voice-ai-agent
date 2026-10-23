@@ -40,6 +40,7 @@ def test_instructions_content():
         "end_interview",
         "next_question",
         "not a follow-up",
+        "skip_question",
     ):
         assert needle in s
 
@@ -60,6 +61,30 @@ async def test_advance_past_end():
     await agent.advance_question()
     assert (await agent.advance_question()).startswith("NO_MORE_QUESTIONS")
     assert agent.current_index == 0
+
+
+async def test_mark_skipped_records_current_question():
+    agent = make_interviewer()
+    await agent.advance_question()
+    await agent.advance_question()
+    agent.mark_skipped()
+    assert agent.skipped == {1}
+
+
+async def test_closing_exchange_not_attributed_to_last_answer():
+    a = SpeechAnalytics()
+    now = {"t": 10.0}
+    agent = make_interviewer(a, plan=PLAN3[:1], clock=lambda: now["t"])
+    await agent.advance_question()
+    agent.observe_final(stt.SpeechData(language="en", text="my answer", start_time=1.0, end_time=2.0))
+    now["t"] = 20.0
+    assert (await agent.advance_question()).startswith("NO_MORE_QUESTIONS")
+    now["t"] = 30.0
+    agent.observe_final(
+        stt.SpeechData(language="en", text="what's the team like", start_time=19.0, end_time=20.0)
+    )
+    assert [s.text for s in a.segments_for(0)] == ["my answer"]
+    assert a.closed_at == 20.0
 
 
 async def test_finish_idempotent():

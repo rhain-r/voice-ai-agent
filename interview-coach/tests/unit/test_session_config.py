@@ -4,6 +4,7 @@ from interview_coach.agent.session_config import (
     CompletionGuard,
     completion_status,
     keyterms_for,
+    room_options,
     segment_qa,
     turn_handling,
     wait_until_quiet,
@@ -47,6 +48,44 @@ def test_segment_qa_joins_text():
         (1, "three", plan[1].text),
     ]
     assert items[0].metrics["word_count"] == 2
+
+
+def test_segment_qa_dialogue_includes_follow_ups():
+    plan = question_plan("Data Analyst", "junior", "behavioral", 2, "s")
+    a = SpeechAnalytics()
+    a.start_question(0, 1.0)
+    a.add_segment(Segment("we fixed it", 3.0, 4.0))
+    a.start_question(1, 10.0)
+    a.add_segment(Segment("second answer", 12.0, 13.0))
+    a.end_questions(20.0)
+    transcript = [
+        {"role": "assistant", "text": "Tell me about a failure.", "at": 2.0},
+        {"role": "user", "text": "we fixed it", "at": 4.5},
+        {"role": "assistant", "text": "What did you personally do?", "at": 5.0},
+        {"role": "user", "text": "I wrote the rollback script", "at": 8.0},
+        {"role": "assistant", "text": "Thanks. Tell me about a conflict.", "at": 11.0},
+        {"role": "user", "text": "second answer", "at": 13.5},
+        {"role": "assistant", "text": "Any questions for me?", "at": 21.0},
+    ]
+    items = segment_qa(plan, a, asked=2, transcript=transcript)
+    assert items[0].dialogue == (
+        "Interviewer: Tell me about a failure.\nCandidate: we fixed it\n"
+        "Interviewer: What did you personally do?\nCandidate: I wrote the rollback script"
+    )
+    assert items[1].dialogue == "Interviewer: Thanks. Tell me about a conflict.\nCandidate: second answer"
+
+
+def test_segment_qa_carries_style_and_skips():
+    plan = question_plan("Data Analyst", "junior", "mixed", 2, "s")
+    a = SpeechAnalytics()
+    a.start_question(0, 0.0)
+    a.start_question(1, 5.0)
+    items = segment_qa(plan, a, asked=2, skipped={1})
+    assert [(i.style, i.skipped) for i in items] == [("behavioral", False), ("technical", True)]
+
+
+def test_room_options_delete_room_when_session_ends():
+    assert room_options().delete_room_on_close is True
 
 
 def test_segment_qa_includes_asked_but_unanswered():

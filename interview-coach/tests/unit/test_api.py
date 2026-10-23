@@ -134,6 +134,16 @@ def test_retry_after_failure_succeeds(client, grader):
     assert client.get(f"/api/sessions/{sid}/report").json()["status"] == "ready"
 
 
+def test_all_skipped_session_is_empty_not_failed(client):
+    sid = new_session(client)
+    unanswered = {**PAYLOAD, "status": "partial", "qa_items": [{**PAYLOAD["qa_items"][0], "transcript": ""}]}
+    post_complete(client, sid, unanswered)
+    r = client.get(f"/api/sessions/{sid}/report").json()
+    assert r["status"] == "empty" and "ValueError" not in (r["error"] or "")
+    assert r["speech"] == PAYLOAD["speech"]
+    assert client.post(f"/api/sessions/{sid}/report/retry").status_code == 409
+
+
 def test_unknown_session_404(client):
     assert client.get("/api/sessions/s_nope/report").status_code == 404
 

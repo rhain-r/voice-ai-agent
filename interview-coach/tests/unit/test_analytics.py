@@ -71,6 +71,17 @@ def test_segments_attributed_to_current_question_and_talk_ratio():
     assert round(a.session_metrics().talk_ratio, 2) == 0.6
 
 
+def test_end_questions_stops_attribution():
+    a = SpeechAnalytics()
+    a.start_question(0, 1.0)
+    a.add_segment(Segment("my answer", 2.0, 3.0))
+    a.end_questions(at=10.0)
+    a.add_segment(Segment("do you have a remote policy", 11.0, 13.0))
+    assert [s.text for s in a.segments_for(0)] == ["my answer"]
+    assert (a.asked_at(0), a.asked_at(1), a.closed_at) == (1.0, None, 10.0)
+    assert len(a.session_metrics().answers) == 1
+
+
 def test_session_metrics_empty_is_zero():
     s = SpeechAnalytics().session_metrics()
     assert (s.answers, s.avg_wpm, s.talk_ratio, s.avg_thinking_time_s) == ([], 0.0, 0.0, None)

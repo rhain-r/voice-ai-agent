@@ -95,10 +95,21 @@ class SpeechAnalytics:
         self._questions: dict[int, _Question] = {}
         self._current: int | None = None
         self._agent: list[tuple[float, float]] = []
+        self.closed_at: float | None = None
 
     def start_question(self, index: int, at: float) -> None:
         self._questions.setdefault(index, _Question(asked_at=at))
         self._current = index
+
+    def end_questions(self, at: float) -> None:
+        """The planned questions are over; later speech (the candidate's own questions) is not an answer."""
+        if self.closed_at is None:
+            self.closed_at = at
+        self._current = None
+
+    def asked_at(self, index: int) -> float | None:
+        question = self._questions.get(index)
+        return question.asked_at if question else None
 
     def add_segment(self, seg: Segment) -> None:
         if self._current is None or not seg.text.strip():
