@@ -1,0 +1,632 @@
+/* Kitchen Companion: a tablet on the counter at night. Read from a metre away, touched with
+   floury knuckles. Colour carries state: saffron = under a minute, tomato = done, basil = listening. */
+
+:root {
+  --iron: #12191b;
+  --iron-raised: #1b2528;
+  --iron-edge: #2b3a3f;
+  --enamel: #f3eee4;
+  --steam: #93a6a8;
+  --saffron: #f2b33d;
+  --tomato: #e8573f;
+  --basil: #74c69d;
+
+  --font: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, sans-serif;
+  --font-clock: "Atkinson Hyperlegible Mono", ui-monospace, "SF Mono", Consolas, monospace;
+
+  --gutter: clamp(16px, 3vw, 40px);
+  --tap: 56px;
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--iron);
+  color: var(--enamel);
+  font-family: var(--font);
+  font-size: 18px;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+:focus-visible {
+  outline: 3px solid var(--saffron);
+  outline-offset: 3px;
+}
+
+.text-button {
+  min-height: 44px;
+  padding: 0 4px;
+  background: none;
+  border: none;
+  color: var(--steam);
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.text-button:hover {
+  color: var(--enamel);
+}
+
+/* ---- Recipe picker ------------------------------------------------------------------------- */
+
+.picker {
+  max-width: 46rem;
+  padding: var(--gutter);
+  padding-top: calc(var(--gutter) * 1.5);
+}
+
+.picker-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 24px;
+  margin-bottom: 32px;
+}
+
+.picker-head h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+.import {
+  margin-bottom: 32px;
+}
+
+.import label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--steam);
+  font-weight: 500;
+}
+
+.import-row {
+  display: flex;
+  gap: 12px;
+}
+
+.import input {
+  flex: 1;
+  min-width: 0;
+  min-height: var(--tap);
+  padding: 0 16px;
+  background: var(--iron-raised);
+  border: 2px solid var(--iron-edge);
+  border-radius: 12px;
+}
+
+.import input:focus-visible {
+  border-color: var(--saffron);
+  outline: none;
+}
+
+.import button {
+  min-height: var(--tap);
+  padding: 0 24px;
+  background: var(--enamel);
+  color: var(--iron);
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+.import button:disabled {
+  opacity: 0.45;
+}
+
+.import-error,
+.picker-note {
+  margin-top: 12px;
+  max-width: 60ch;
+}
+
+.import-error {
+  color: var(--tomato);
+  font-weight: 500;
+}
+
+.picker-note {
+  color: var(--steam);
+}
+
+.recipe-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--iron-edge);
+}
+
+.recipe-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  min-height: 88px;
+  padding: 18px 4px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--iron-edge);
+  text-align: left;
+}
+
+.recipe-row:not(:disabled):hover .recipe-title {
+  color: var(--saffron);
+}
+
+.recipe-row:disabled {
+  opacity: 0.5;
+}
+
+.recipe-title {
+  font-size: clamp(1.5rem, 3.5vw, 2rem);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.recipe-meta {
+  color: var(--steam);
+}
+
+/* ---- Cook mode ----------------------------------------------------------------------------- */
+
+.cook {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100dvh;
+  padding: var(--gutter);
+  gap: clamp(16px, 3vh, 32px);
+}
+
+.cook-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.cook-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 20px;
+  min-width: 0;
+}
+
+.cook-title h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.cook-body {
+  display: grid;
+  gap: clamp(24px, 4vw, 48px);
+  min-width: 0;
+}
+
+.cook-main {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 32px;
+  min-width: 0;
+}
+
+/* The step is the point of the whole screen. */
+.step-count {
+  color: var(--steam);
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.step-text {
+  max-width: 26ch;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 500;
+  line-height: 1.18;
+  letter-spacing: -0.012em;
+  overflow-wrap: anywhere;
+  animation: step-in 260ms ease-out;
+}
+
+@keyframes step-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+.progress {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 24px 0 0 -12px;
+  padding: 0;
+  list-style: none;
+}
+
+.dot {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  background: none;
+  border: none;
+}
+
+.dot::after {
+  content: "";
+  position: absolute;
+  inset: 13px;
+  border: 2px solid var(--steam);
+  border-radius: 50%;
+}
+
+.dot.done::after {
+  background: var(--steam);
+}
+
+.dot.current::after {
+  inset: 10px;
+  background: var(--saffron);
+  border-color: var(--saffron);
+}
+
+.cook-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.timers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.timers-empty {
+  color: var(--steam);
+  max-width: 34ch;
+}
+
+.timer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 9rem;
+  padding: 10px 18px 12px;
+  background: var(--iron-raised);
+  border: 2px solid var(--iron-edge);
+  border-radius: 16px;
+  text-align: left;
+  cursor: default;
+}
+
+.timer-label {
+  color: var(--steam);
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.timer-clock {
+  font-family: var(--font-clock);
+  font-size: 2.25rem;
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.timer.soon {
+  border-color: var(--saffron);
+}
+
+.timer.soon .timer-clock {
+  color: var(--saffron);
+}
+
+.timer.due {
+  background: var(--tomato);
+  border-color: var(--tomato);
+  color: var(--iron);
+  cursor: pointer;
+  animation: due-pulse 1s ease-in-out infinite alternate;
+}
+
+.timer.due .timer-label {
+  color: var(--iron);
+}
+
+@keyframes due-pulse {
+  to {
+    box-shadow: 0 0 0 10px rgba(232, 87, 63, 0.28);
+  }
+}
+
+.engage {
+  min-width: min(100%, 15rem);
+  min-height: 104px;
+  padding: 0 40px;
+  background: var(--saffron);
+  color: var(--iron);
+  border: none;
+  border-radius: 52px;
+  font-size: 1.85rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.engage:active {
+  transform: scale(0.98);
+}
+
+.engage.armed {
+  background: var(--basil);
+}
+
+.engage:disabled {
+  background: var(--iron-edge);
+  color: var(--steam);
+}
+
+.ingredients {
+  min-width: 0;
+}
+
+.ingredients h2 {
+  margin-bottom: 8px;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.ingredients ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ingredient {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  min-height: 48px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--iron-edge);
+  cursor: pointer;
+}
+
+.ingredient input {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  margin: 1px 0 0;
+  accent-color: var(--basil);
+}
+
+.ingredient.ticked span {
+  color: var(--steam);
+  text-decoration: line-through;
+}
+
+.cook-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px 24px;
+}
+
+.error {
+  margin-right: auto;
+  color: var(--tomato);
+}
+
+/* ---- Status orb ---------------------------------------------------------------------------- */
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: none;
+  min-height: 44px;
+  color: var(--steam);
+  font-weight: 500;
+}
+
+.orb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--steam);
+}
+
+.orb.listening {
+  background: var(--basil);
+  animation: listen 1.2s ease-in-out infinite;
+}
+
+.orb.thinking {
+  background: var(--saffron);
+}
+
+.orb.speaking {
+  background: var(--enamel);
+}
+
+.orb.offline {
+  background: none;
+  border: 3px solid var(--tomato);
+}
+
+@keyframes listen {
+  50% {
+    box-shadow: 0 0 0 8px rgba(116, 198, 157, 0.25);
+  }
+}
+
+/* ---- Transcript drawer --------------------------------------------------------------------- */
+
+.drawer {
+  position: fixed;
+  inset: 0 0 0 auto;
+  z-index: 10;
+  width: min(30rem, 100vw);
+  padding: var(--gutter);
+  overflow-y: auto;
+  background: var(--iron-raised);
+  border-left: 1px solid var(--iron-edge);
+  transform: translateX(100%);
+  visibility: hidden;
+  transition:
+    transform 220ms ease-out,
+    visibility 0s linear 220ms;
+}
+
+.drawer.open {
+  transform: none;
+  visibility: visible;
+  transition: transform 220ms ease-out;
+}
+
+.drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.drawer-head h2 {
+  font-size: 1.25rem;
+}
+
+.drawer-empty {
+  color: var(--steam);
+}
+
+.lines {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.line {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr;
+  gap: 2px 12px;
+}
+
+.line-who {
+  color: var(--steam);
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding-top: 2px;
+}
+
+.line-text {
+  overflow-wrap: anywhere;
+}
+
+.line.overheard {
+  opacity: 0.45;
+}
+
+.line.reply .line-text {
+  color: var(--enamel);
+}
+
+.chip {
+  grid-column: 2;
+  justify-self: start;
+  padding: 1px 10px;
+  border-radius: 999px;
+  font-family: var(--font-clock);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.chip.fast {
+  background: rgba(116, 198, 157, 0.18);
+  color: var(--basil);
+}
+
+.chip.llm {
+  background: rgba(242, 179, 61, 0.16);
+  color: var(--saffron);
+}
+
+/* ---- Layout by orientation ----------------------------------------------------------------- */
+
+@media (orientation: landscape) and (min-width: 900px) {
+  .cook-body {
+    grid-template-columns: minmax(0, 2fr) minmax(16rem, 1fr);
+  }
+
+  .ingredients {
+    max-height: calc(100dvh - 12rem);
+    padding-left: clamp(24px, 3vw, 40px);
+    overflow-y: auto;
+    border-left: 1px solid var(--iron-edge);
+  }
+}
+
+@media (max-width: 520px) {
+  .engage {
+    width: 100%;
+  }
+
+  .import-row {
+    flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "id": "fluffy-pancakes",
+  "title": "Fluffy Pancakes",
+  "servings": 4,
+  "total_time_min": 25,
+  "ingredients": [
+    "1 1/2 cups all-purpose flour",
+    "2 tbsp sugar",
+    "2 tsp baking powder",
+    "1/2 tsp salt",
+    "1 1/4 cups whole milk",
+    "1 large egg",
+    "3 tbsp unsalted butter, melted",
+    "1 tsp vanilla extract"
+  ],
+  "steps": [
+    {
+      "text": "Whisk the flour, sugar, baking powder and salt in a large bowl."
+    },
+    {
+      "text": "In a second bowl, whisk the milk, egg, melted butter and vanilla."
+    },
+    {
+      "text": "Pour the wet ingredients into the dry and stir until just combined. A few lumps are fine."
+    },
+    {
+      "text": "Rest the batter for 5 minutes while the pan heats.",
+      "timer_minutes": 5
+    },
+    {
+      "text": "Heat a lightly buttered skillet over medium heat."
+    },
+    {
+      "text": "Pour a quarter cup of batter per pancake and cook for 2 minutes, until bubbles form.",
+      "timer_minutes": 2
+    },
+    {
+      "text": "Flip and cook 1 to 2 minutes more, until golden. Serve warm."
+    }
+  ]
+}

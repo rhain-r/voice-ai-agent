@@ -1,0 +1,43 @@
+{
+  "id": "tomato-soup",
+  "title": "Tomato Soup",
+  "servings": 4,
+  "total_time_min": 45,
+  "ingredients": [
+    "2 tbsp olive oil",
+    "1 tbsp unsalted butter",
+    "1 onion, chopped",
+    "3 cloves garlic, minced",
+    "2 (28 oz) cans whole peeled tomatoes",
+    "2 cups vegetable broth",
+    "1 tsp sugar",
+    "1 tsp salt",
+    "1/2 cup heavy cream",
+    "6 fresh basil leaves"
+  ],
+  "steps": [
+    {
+      "text": "Heat the olive oil and butter in a large pot over medium heat."
+    },
+    {
+      "text": "Cook the onion for 6 minutes, until soft.",
+      "timer_minutes": 6
+    },
+    {
+      "text": "Add the garlic and cook for 1 minute."
+    },
+    {
+      "text": "Add the tomatoes, broth, sugar and salt, and bring to a boil."
+    },
+    {
+      "text": "Simmer for 20 minutes, stirring now and then.",
+      "timer_minutes": 20
+    },
+    {
+      "text": "Blend until smooth, then stir in the cream and basil."
+    },
+    {
+      "text": "Taste, adjust the salt, and serve hot."
+    }
+  ]
+}

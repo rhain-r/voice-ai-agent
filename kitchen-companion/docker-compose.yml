@@ -1,0 +1,13 @@
+# One service: the Pipecat bot server, which also serves the tablet app. There's no media server;
+# audio flows peer to peer between the browser and this container over WebRTC (see the README
+# for the UDP caveat when the browser isn't on the same machine).
+services:
+  kitchen:
+    build: .
+    image: kitchen-companion
+    env_file:
+      - path: .env
+        required: false
+    ports:
+      - "7860:7860"
+    restart: unless-stopped

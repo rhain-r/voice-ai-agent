@@ -1,0 +1,15 @@
+{
+  "name": "Kitchen Companion",
+  "short_name": "Chef",
+  "description": "A hands-free cooking assistant for the tablet on your counter.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#12191b",
+  "theme_color": "#12191b",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

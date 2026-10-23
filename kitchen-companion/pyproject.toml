@@ -1,0 +1,46 @@
+[project]
+name = "kitchen-companion"
+version = "0.1.0"
+description = "Hands-free voice cooking assistant built on Pipecat, SmallWebRTC and Claude"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "pipecat-ai[anthropic,deepgram,silero,cartesia,webrtc,runner]==1.13.0",
+    "anthropic>=1.17",
+    "fastapi>=0.115",
+    "uvicorn>=0.30",
+    "httpx>=0.27",
+    "pydantic>=2.7",
+    "pydantic-settings>=2.4",
+]
+
+[project.scripts]
+kitchen-server = "kitchen_companion.server:run"
+
+[dependency-groups]
+dev = ["pytest>=8", "pytest-asyncio>=0.24", "ruff>=0.6"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/kitchen_companion"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+markers = ["eval: needs ANTHROPIC_API_KEY"]
+addopts = "-m 'not eval'"
+# Warnings raised inside pipecat's own imports (stdlib audioop, a deprecated internal base class).
+filterwarnings = [
+    "ignore:'audioop' is deprecated:DeprecationWarning",
+    "ignore:`AudioContextTTSService` is deprecated:DeprecationWarning",
+]
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]

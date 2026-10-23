@@ -1,0 +1,80 @@
+name: kitchen-companion
+
+on:
+  push:
+    paths:
+      - "kitchen-companion/**"
+      - ".github/workflows/kitchen-companion.yml"
+  pull_request:
+    paths:
+      - "kitchen-companion/**"
+      - ".github/workflows/kitchen-companion.yml"
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: kitchen-companion
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+          enable-cache: true
+          cache-dependency-glob: kitchen-companion/uv.lock
+
+      - name: Install
+        run: uv sync --frozen
+
+      - name: Lint
+        run: uv run ruff check
+
+      - name: Unit and pipeline tests (no keys)
+        run: uv run pytest
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: kitchen-companion/web/package-lock.json
+
+      - name: Web typecheck and build
+        working-directory: kitchen-companion/web
+        run: |
+          npm ci
+          npm run typecheck
+          npm run build
+
+  evals:
+    # Tool-call evals against Claude Haiku 5.5. They only run when the repository has the secret.
+    runs-on: ubuntu-latest
+    needs: test
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+    steps:
+      - name: Skip without a key
+        if: env.ANTHROPIC_API_KEY == ''
+        working-directory: .
+        run: echo "ANTHROPIC_API_KEY is not set; skipping evals."
+
+      - uses: actions/checkout@v4
+        if: env.ANTHROPIC_API_KEY != ''
+
+      - uses: astral-sh/setup-uv@v6
+        if: env.ANTHROPIC_API_KEY != ''
+        with:
+          python-version: "3.12"
+          enable-cache: true
+          cache-dependency-glob: kitchen-companion/uv.lock
+
+      - name: Tool-call evals
+        if: env.ANTHROPIC_API_KEY != ''
+        run: |
+          uv sync --frozen
+          uv run pytest -m eval -v

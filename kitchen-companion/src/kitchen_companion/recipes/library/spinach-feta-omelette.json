@@ -1,0 +1,37 @@
+{
+  "id": "spinach-feta-omelette",
+  "title": "Spinach & Feta Omelette",
+  "servings": 1,
+  "total_time_min": 15,
+  "ingredients": [
+    "3 large eggs",
+    "1 tbsp whole milk",
+    "1/8 tsp salt",
+    "1 pinch black pepper",
+    "1 tbsp unsalted butter",
+    "1 cup baby spinach",
+    "1/4 cup crumbled feta"
+  ],
+  "steps": [
+    {
+      "text": "Whisk the eggs, milk, salt and pepper until smooth."
+    },
+    {
+      "text": "Melt the butter in a nonstick skillet over medium heat."
+    },
+    {
+      "text": "Wilt the spinach in the pan for 1 minute, then set it aside.",
+      "timer_minutes": 1
+    },
+    {
+      "text": "Pour in the eggs and cook undisturbed for 2 minutes, until the edges set.",
+      "timer_minutes": 2
+    },
+    {
+      "text": "Scatter the spinach and feta over one half."
+    },
+    {
+      "text": "Fold the omelette, cook 1 more minute, and slide it onto a plate."
+    }
+  ]
+}
