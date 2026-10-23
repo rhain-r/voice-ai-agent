@@ -63,7 +63,8 @@ def test_convert_temp():
 
 
 def test_normalize_unit_case():
-    assert (normalize_unit("T"), normalize_unit("t"), normalize_unit("Tablespoons")) == ("tbsp", "tsp", "tbsp")
+    got = (normalize_unit("T"), normalize_unit("t"), normalize_unit("Tablespoons"))
+    assert got == ("tbsp", "tsp", "tbsp")
 
 
 @pytest.mark.parametrize(
