@@ -1,0 +1,91 @@
+{
+  "general": {
+    "behavioral": [
+      {"text": "Tell me about a time you disagreed with a teammate. How did you handle it?", "competency": "conflict", "levels": ["intern", "junior", "mid", "senior", "staff"], "good_answer_covers": ["the disagreement in concrete terms", "how they listened", "the resolution", "the relationship afterwards"]},
+      {"text": "Tell me about a project that didn't go as planned. What happened, and what did you do?", "competency": "failure", "levels": ["junior", "mid", "senior", "staff"], "good_answer_covers": ["what went wrong", "their own part in it", "the recovery", "what they changed afterwards"]},
+      {"text": "Describe a time you led something without having formal authority.", "competency": "leadership", "levels": ["mid", "senior", "staff"], "good_answer_covers": ["why they stepped up", "how they got buy-in", "the outcome", "a measurable result"]},
+      {"text": "Tell me about a time the requirements were unclear. How did you move forward?", "competency": "ambiguity", "levels": ["junior", "mid", "senior", "staff"], "good_answer_covers": ["what was unclear", "how they reduced uncertainty", "the decision they made", "the result"]},
+      {"text": "Tell me about a time you had more work than you could finish. How did you decide what to drop?", "competency": "prioritization", "levels": ["intern", "junior", "mid", "senior"], "good_answer_covers": ["the competing demands", "the criteria they used", "how they communicated trade-offs", "the outcome"]},
+      {"text": "Tell me about some critical feedback you received and what you did with it.", "competency": "feedback", "levels": ["intern", "junior", "mid", "senior"], "good_answer_covers": ["the specific feedback", "their initial reaction", "the change they made", "evidence it worked"]},
+      {"text": "Describe a time you changed someone's mind about an important decision.", "competency": "influence", "levels": ["mid", "senior", "staff"], "good_answer_covers": ["the original position", "the evidence or approach they used", "the decision that changed", "the impact"]},
+      {"text": "Tell me about a time you had to deliver under a tight deadline.", "competency": "deadline", "levels": ["intern", "junior", "mid", "senior"], "good_answer_covers": ["the deadline and stakes", "what they cut or simplified", "how they kept quality", "whether they hit it"]},
+      {"text": "Tell me about something you had to learn quickly to get a job done.", "competency": "learning", "levels": ["intern", "junior", "mid"], "good_answer_covers": ["what they needed to learn", "how they learned it", "how they applied it", "the result"]},
+      {"text": "Tell me about a time you noticed a problem that wasn't your job to fix. What did you do?", "competency": "ownership", "levels": ["junior", "mid", "senior", "staff"], "good_answer_covers": ["the problem", "why they acted", "what they did", "the outcome for the team"]},
+      {"text": "Tell me about a mistake you made that affected other people.", "competency": "accountability", "levels": ["junior", "mid", "senior", "staff"], "good_answer_covers": ["the mistake", "how they owned it", "how they fixed it", "what they do differently now"]},
+      {"text": "What's the piece of work you're proudest of, and why?", "competency": "impact", "levels": ["intern", "junior", "mid", "senior", "staff"], "good_answer_covers": ["what they built or did", "their personal contribution", "why it mattered", "a measurable result"]}
+    ],
+    "technical": [
+      {"text": "Walk me through how you'd break down a big, vague problem into something you can start on this week.", "competency": "problem solving", "levels": ["intern", "junior", "mid", "senior"], "good_answer_covers": ["clarifying the goal", "breaking it into parts", "picking a first step", "how they'd check progress"]},
+      {"text": "How would you decide between two reasonable options when you only have part of the data?", "competency": "decision making", "levels": ["junior", "mid", "senior", "staff"], "good_answer_covers": ["the criteria", "what extra data is worth getting", "reversibility of the decision", "how they'd revisit it"]},
+      {"text": "If you changed a process at work, how would you know whether the change actually helped?", "competency": "measurement", "levels": ["junior", "mid", "senior"], "good_answer_covers": ["a baseline", "a clear metric", "a comparison", "confounding factors"]},
+      {"text": "Explain something complex from your field as if I had no background in it.", "competency": "communication", "levels": ["intern", "junior", "mid", "senior", "staff"], "good_answer_covers": ["a simple framing", "an analogy or example", "checking understanding", "no jargon"]}
+    ]
+  },
+  "software": {
+    "behavioral": [
+      {"text": "Tell me about a technical decision you disagreed with. What did you do?", "competency": "technical judgment", "levels": ["mid", "senior", "staff"], "good_answer_covers": ["the decision and their concern", "how they raised it", "the evidence they used", "what happened"]},
+      {"text": "Tell me about a time you shipped something with known technical debt. How did you handle it?", "competency": "pragmatism", "levels": ["junior", "mid", "senior"], "good_answer_covers": ["why they took the debt", "how they made it visible", "the plan to pay it back", "whether they did"]},
+      {"text": "Tell me about a time you helped another engineer level up.", "competency": "mentoring", "levels": ["mid", "senior", "staff"], "good_answer_covers": ["the person's gap", "what they did", "how they measured progress", "the result"]}
+    ],
+    "technical": [
+      {"text": "Walk me through how you'd design a URL shortener that handles millions of links.", "competency": "system design", "levels": ["mid", "senior", "staff"], "good_answer_covers": ["requirements and scale", "ID generation", "storage choice", "caching and reads", "trade-offs"]},
+      {"text": "An API's latency suddenly doubled in production. How would you investigate?", "competency": "debugging", "levels": ["junior", "mid", "senior"], "good_answer_covers": ["checking recent changes", "metrics and traces", "narrowing to a component", "mitigation before root cause"]},
+      {"text": "How do you decide between a relational database and a document store for a new service?", "competency": "data modeling", "levels": ["junior", "mid", "senior"], "good_answer_covers": ["query patterns", "consistency needs", "schema evolution", "operational cost"]},
+      {"text": "How would you test a new feature that touches payments?", "competency": "testing", "levels": ["junior", "mid", "senior"], "good_answer_covers": ["unit and integration layers", "edge cases like retries and duplicates", "test environments", "rollout safety"]},
+      {"text": "What do you look for when you review someone else's code?", "competency": "code quality", "levels": ["intern", "junior", "mid"], "good_answer_covers": ["correctness first", "readability", "tests", "tone of feedback"]},
+      {"text": "How would you roll out a risky change to a service with many users?", "competency": "delivery", "levels": ["mid", "senior", "staff"], "good_answer_covers": ["feature flags or canaries", "metrics to watch", "rollback plan", "communication"]}
+    ]
+  },
+  "data": {
+    "behavioral": [
+      {"text": "Tell me about a time your analysis changed a decision.", "competency": "influence with data", "levels": ["junior", "mid", "senior"], "good_answer_covers": ["the question", "the analysis", "how they presented it", "the decision that changed"]},
+      {"text": "Tell me about a time you found a problem in the data after you'd already shared results.", "competency": "integrity", "levels": ["junior", "mid", "senior"], "good_answer_covers": ["how they found it", "how they told people", "the correction", "the safeguard they added"]}
+    ],
+    "technical": [
+      {"text": "How would you design an A/B test for a new checkout button?", "competency": "experimentation", "levels": ["junior", "mid", "senior"], "good_answer_covers": ["hypothesis", "primary metric", "sample size and duration", "guardrail metrics", "how to read the result"]},
+      {"text": "A key dashboard metric dropped twenty percent overnight. What do you check first?", "competency": "investigation", "levels": ["intern", "junior", "mid"], "good_answer_covers": ["data pipeline issues", "tracking changes", "segmenting the drop", "real-world causes"]},
+      {"text": "How would you define a good success metric for a new feature?", "competency": "metrics", "levels": ["junior", "mid", "senior"], "good_answer_covers": ["link to user value", "measurability", "counter-metrics", "time window"]},
+      {"text": "How do you handle missing or messy values in a dataset before analysis?", "competency": "data cleaning", "levels": ["intern", "junior", "mid"], "good_answer_covers": ["understanding why data is missing", "options like dropping or imputing", "impact on conclusions", "documenting choices"]},
+      {"text": "Walk me through how you'd calculate monthly user retention in SQL.", "competency": "SQL", "levels": ["junior", "mid", "senior"], "good_answer_covers": ["defining a cohort", "the joins or window functions", "edge cases", "validating the numbers"]}
+    ]
+  },
+  "ai_ml": {
+    "behavioral": [
+      {"text": "Tell me about a model or AI feature that didn't work in production the way it did offline.", "competency": "production ML", "levels": ["mid", "senior", "staff"], "good_answer_covers": ["the gap between offline and online", "how they diagnosed it", "the fix", "what they monitor now"]},
+      {"text": "Tell me about a time you had to explain a model's limitations to non-technical stakeholders.", "competency": "communication", "levels": ["junior", "mid", "senior"], "good_answer_covers": ["the limitation", "how they framed it", "the decision it informed", "the outcome"]}
+    ],
+    "technical": [
+      {"text": "How would you evaluate whether an LLM-powered feature is good enough to ship?", "competency": "evaluation", "levels": ["junior", "mid", "senior", "staff"], "good_answer_covers": ["an eval set from real cases", "grading method", "failure categories", "a ship threshold", "monitoring after launch"]},
+      {"text": "Walk me through how you'd design a retrieval-augmented question-answering system over company documents.", "competency": "system design", "levels": ["mid", "senior", "staff"], "good_answer_covers": ["chunking and indexing", "retrieval quality", "grounding and citations", "evaluation", "latency and cost"]},
+      {"text": "How would you notice and handle model drift after deployment?", "competency": "monitoring", "levels": ["junior", "mid", "senior"], "good_answer_covers": ["input and output monitoring", "alert thresholds", "retraining triggers", "safe rollback"]},
+      {"text": "When would you trade precision for recall, and how would you choose the threshold?", "competency": "metrics", "levels": ["intern", "junior", "mid"], "good_answer_covers": ["cost of each error type", "a concrete example", "threshold selection method", "business input"]},
+      {"text": "Your model's offline accuracy looks suspiciously high. What could be going on?", "competency": "data leakage", "levels": ["intern", "junior", "mid", "senior"], "good_answer_covers": ["target leakage", "train-test contamination", "time-based splits", "how to verify"]}
+    ]
+  },
+  "product": {
+    "behavioral": [
+      {"text": "Tell me about a time you said no to a stakeholder's request.", "competency": "stakeholder management", "levels": ["junior", "mid", "senior"], "good_answer_covers": ["the request", "why they declined", "how they communicated it", "the relationship afterwards"]},
+      {"text": "Tell me about a product decision you made that turned out to be wrong.", "competency": "judgment", "levels": ["mid", "senior", "staff"], "good_answer_covers": ["the decision and reasoning", "how they found out", "what they did", "what they learned"]}
+    ],
+    "technical": [
+      {"text": "You have ten feature requests and capacity for three. How do you choose?", "competency": "prioritization", "levels": ["junior", "mid", "senior"], "good_answer_covers": ["a framework like impact versus effort", "tie to strategy", "input from users and data", "communicating the cut"]},
+      {"text": "Usage of a feature you launched is declining. How do you figure out why?", "competency": "diagnosis", "levels": ["junior", "mid", "senior"], "good_answer_covers": ["segmenting the decline", "qualitative research", "competitive or seasonal factors", "a next step"]},
+      {"text": "How would you define success for a new onboarding flow?", "competency": "metrics", "levels": ["intern", "junior", "mid"], "good_answer_covers": ["activation definition", "leading and lagging metrics", "a target", "counter-metrics"]},
+      {"text": "Walk me through how you'd plan the launch of a major new feature.", "competency": "execution", "levels": ["mid", "senior", "staff"], "good_answer_covers": ["phased rollout", "success criteria", "cross-team readiness", "risk and rollback"]},
+      {"text": "How would you decide whether to build a capability in-house or buy a vendor solution?", "competency": "strategy", "levels": ["mid", "senior", "staff"], "good_answer_covers": ["core versus non-core", "total cost", "time to market", "lock-in risk"]}
+    ]
+  },
+  "design": {
+    "behavioral": [
+      {"text": "Tell me about a time you got conflicting feedback on a design. How did you resolve it?", "competency": "collaboration", "levels": ["junior", "mid", "senior"], "good_answer_covers": ["the conflicting views", "how they found the underlying goal", "the decision", "how they brought people along"]},
+      {"text": "Tell me about a design you shipped that users didn't respond to as expected.", "competency": "learning", "levels": ["mid", "senior", "staff"], "good_answer_covers": ["the expectation", "the evidence", "the iteration", "the result"]}
+    ],
+    "technical": [
+      {"text": "Walk me through your process for designing a new feature from a vague brief.", "competency": "design process", "levels": ["intern", "junior", "mid", "senior"], "good_answer_covers": ["understanding the problem", "research", "exploring options", "testing and iterating"]},
+      {"text": "How would you run a quick usability test with limited time and budget?", "competency": "research", "levels": ["intern", "junior", "mid"], "good_answer_covers": ["recruiting participants", "tasks to test", "what to observe", "turning findings into changes"]},
+      {"text": "How do you make sure a design works for people with disabilities?", "competency": "accessibility", "levels": ["junior", "mid", "senior"], "good_answer_covers": ["contrast and type", "keyboard and screen readers", "testing with assistive tech", "building it into the process"]},
+      {"text": "When does a team need a design system, and how would you start one?", "competency": "systems thinking", "levels": ["mid", "senior", "staff"], "good_answer_covers": ["signs of inconsistency cost", "starting with an audit", "core components first", "adoption and governance"]},
+      {"text": "How do you decide whether a design is good enough to ship?", "competency": "judgment", "levels": ["junior", "mid", "senior"], "good_answer_covers": ["success criteria", "user evidence", "trade-offs with time", "plan to iterate"]}
+    ]
+  }
+}
