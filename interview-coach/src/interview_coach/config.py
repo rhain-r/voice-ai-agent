@@ -44,6 +44,12 @@ def missing_keys(settings: Settings, required: Sequence[str]) -> list[str]:
     return [name for name in required if not str(getattr(settings, name, "") or "").strip()]
 
 
+def cli_needs_keys(argv: Sequence[str]) -> bool:
+    """LiveKit CLI run modes need keys; `download-files` and help output do not."""
+    args = list(argv[1:])
+    return bool(args) and not {"download-files", "--help", "-h"} & set(args)
+
+
 def require(settings: Settings, required: Sequence[str]) -> None:
     missing = missing_keys(settings, required)
     if missing:

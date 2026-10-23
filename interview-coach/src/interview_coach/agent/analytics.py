@@ -163,9 +163,7 @@ class SpeechAnalytics:
     def session_metrics(self) -> SessionMetrics:
         answers = [self.answer_metrics(i) for i in sorted(self._questions)]
         spoken = [a for a in answers if a.word_count]
-        candidate_s = sum(
-            seg.end - seg.start for q in self._questions.values() for seg in q.segments
-        )
+        candidate_s = sum(seg.end - seg.start for q in self._questions.values() for seg in q.segments)
         agent_s = sum(end - start for start, end in self._agent)
         total_duration = sum(a.duration_s for a in spoken)
         thinking = [a.thinking_time_s for a in answers if a.thinking_time_s is not None]

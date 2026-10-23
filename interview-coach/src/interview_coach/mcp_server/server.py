@@ -11,7 +11,9 @@ from interview_coach.mcp_server import bank
 
 mcp = MCPServer(
     "interview-coach-questions",
-    instructions="Interview question bank: plans of questions per role, level and style, plus a grading rubric.",
+    instructions=(
+        "Interview question bank: plans of questions per role, level and style, plus a grading rubric."
+    ),
 )
 
 

@@ -74,8 +74,8 @@ class Store:
     ) -> None:
         with self._lock, self._db:
             self._db.execute(
-                "INSERT INTO reports (session_id, status, scorecard, error, updated_at) VALUES (?, ?, ?, ?, ?) "
-                "ON CONFLICT(session_id) DO UPDATE SET status = excluded.status, "
+                "INSERT INTO reports (session_id, status, scorecard, error, updated_at) "
+                "VALUES (?, ?, ?, ?, ?) ON CONFLICT(session_id) DO UPDATE SET status = excluded.status, "
                 "scorecard = excluded.scorecard, error = excluded.error, updated_at = excluded.updated_at",
                 (session_id, status, json.dumps(scorecard) if scorecard else None, error, time.time()),
             )

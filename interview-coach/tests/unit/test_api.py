@@ -18,8 +18,13 @@ PAYLOAD = {
         {"role": "user", "text": "I disagreed with my lead about a metric.", "at": 5.0},
     ],
     "qa_items": [
-        {"index": 0, "question": "Tell me about a conflict.", "competency": "conflict",
-         "transcript": "I disagreed with my lead about a metric.", "metrics": {"wpm": 140}},
+        {
+            "index": 0,
+            "question": "Tell me about a conflict.",
+            "competency": "conflict",
+            "transcript": "I disagreed with my lead about a metric.",
+            "metrics": {"wpm": 140},
+        },
     ],
     "speech": {"avg_wpm": 140.0, "fillers_per_min": 2.0, "talk_ratio": 0.6, "answers": []},
     "latency": {"p50_ms": 900, "p95_ms": 1400, "turns": 4},

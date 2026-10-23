@@ -37,7 +37,9 @@ def grade(**dims) -> AnswerGrade:
 
 def ga(index: int, *positional, **dims) -> GradedAnswer:
     if positional:
-        dims = dict(zip(["structure", "specificity", "impact", "relevance", "communication"], positional, strict=True))
+        dims = dict(
+            zip(["structure", "specificity", "impact", "relevance", "communication"], positional, strict=True)
+        )
     return GradedAnswer(index=index, grade=grade(**dims))
 
 

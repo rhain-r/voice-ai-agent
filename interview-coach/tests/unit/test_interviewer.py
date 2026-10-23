@@ -31,8 +31,16 @@ def make_interviewer(analytics=None, plan=PLAN3, clock=lambda: 0.0, progress=Non
 
 def test_instructions_content():
     s = interviewer_instructions(SETUP, 5)
-    for needle in ("Data Analyst", "junior", "5", "Never give feedback", "at most two follow-ups",
-                   "end_interview", "next_question", "not a follow-up"):
+    for needle in (
+        "Data Analyst",
+        "junior",
+        "5",
+        "Never give feedback",
+        "at most two follow-ups",
+        "end_interview",
+        "next_question",
+        "not a follow-up",
+    ):
         assert needle in s
 
 
@@ -68,8 +76,13 @@ async def test_final_transcript_feeds_analytics_in_wall_time():
     agent = make_interviewer(a, clock=lambda: now["t"])
     await agent.advance_question()
     now["t"] = 100.0
-    words = [TimedString("hello", start_time=1.0, end_time=1.4), TimedString("there", start_time=1.6, end_time=2.0)]
-    agent.observe_final(stt.SpeechData(language="en", text="hello there", start_time=1.0, end_time=2.0, words=words))
+    words = [
+        TimedString("hello", start_time=1.0, end_time=1.4),
+        TimedString("there", start_time=1.6, end_time=2.0),
+    ]
+    agent.observe_final(
+        stt.SpeechData(language="en", text="hello there", start_time=1.0, end_time=2.0, words=words)
+    )
     seg = a.segments_for(0)[0]
     assert (seg.text, seg.start, seg.end) == ("hello there", 99.0, 100.0)
     assert [(w.start, w.end) for w in seg.words] == [(99.0, 99.4), (99.6, 100.0)]

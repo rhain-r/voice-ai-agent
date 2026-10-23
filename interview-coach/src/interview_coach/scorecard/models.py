@@ -37,7 +37,9 @@ class AnswerGrade(BaseModel):
 
 class CoachingPlan(BaseModel):
     top_fixes: list[str] = Field(min_length=3, max_length=3, description="Exactly three")
-    rewritten_answer: str = Field(description="The weakest answer rewritten in STAR form, using only facts given")
+    rewritten_answer: str = Field(
+        description="The weakest answer rewritten in STAR form, using only facts given"
+    )
     practice_drill: str
 
 

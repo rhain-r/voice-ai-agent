@@ -1,6 +1,20 @@
 import pytest
 
-from interview_coach.config import Settings, missing_keys, require
+from interview_coach.config import Settings, cli_needs_keys, missing_keys, require
+
+
+@pytest.mark.parametrize(
+    "argv,needs",
+    [
+        (["coach-agent", "start"], True),
+        (["coach-agent", "dev"], True),
+        (["coach-agent", "download-files"], False),
+        (["coach-agent", "--help"], False),
+        (["coach-agent"], False),
+    ],
+)
+def test_cli_needs_keys_only_for_run_modes(argv, needs):
+    assert cli_needs_keys(argv) is needs
 
 
 def test_missing_keys_reports_empty_and_unset():

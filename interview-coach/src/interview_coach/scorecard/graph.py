@@ -93,7 +93,9 @@ class ClaudeGrader:
         for item in items:
             g = grades.get(item.index)
             verdict = g.one_line_verdict if g else "skipped"
-            blocks.append(f"Q{item.index + 1}: {item.question}\nAnswer: {item.transcript}\nVerdict: {verdict}")
+            blocks.append(
+                f"Q{item.index + 1}: {item.question}\nAnswer: {item.transcript}\nVerdict: {verdict}"
+            )
         content = f"Role: {session.role} ({session.level}).\n\n" + "\n\n".join(blocks)
         return await self._parse(CoachingPlan, _COACH_SYSTEM, content)
 
