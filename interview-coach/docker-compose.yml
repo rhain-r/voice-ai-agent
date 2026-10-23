@@ -1,0 +1,59 @@
+# `cp .env.example .env`, add your Anthropic and Deepgram keys, then `docker compose up --build`.
+# Open http://localhost:3000.
+
+services:
+  livekit:
+    # Local media server in dev mode (API key "devkey", secret "secret"). No LiveKit account needed.
+    image: livekit/livekit-server:latest
+    command: --dev --bind 0.0.0.0 --node-ip 127.0.0.1
+    ports:
+      - "7880:7880"
+      - "7881:7881"
+      - "7882:7882/udp"
+
+  mcp:
+    build: .
+    command: coach-mcp
+    ports:
+      - "8765:8765"
+
+  api:
+    build: .
+    command: coach-api
+    env_file:
+      - path: .env
+        required: false  # without keys, services exit naming the missing variables
+    environment:
+      # Returned to the browser, so it must be the host-facing address.
+      LIVEKIT_URL: ws://localhost:7880
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+
+  agent:
+    build: .
+    command: coach-agent start
+    env_file:
+      - path: .env
+        required: false  # without keys, services exit naming the missing variables
+    environment:
+      LIVEKIT_URL: ws://livekit:7880
+      MCP_URL: http://mcp:8765/mcp
+      API_URL: http://api:8000
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      - livekit
+      - mcp
+      - api
+
+  web:
+    build:
+      context: ./web
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api

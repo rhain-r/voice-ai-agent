@@ -1,0 +1,50 @@
+name: interview-coach
+
+on:
+  push:
+    paths: ["interview-coach/**", ".github/workflows/interview-coach.yml"]
+  pull_request:
+    paths: ["interview-coach/**", ".github/workflows/interview-coach.yml"]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: interview-coach
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync --frozen
+      - run: uv run ruff check src tests
+      - run: uv run pytest
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: interview-coach/web/package-lock.json
+      - name: Web typecheck and build
+        working-directory: interview-coach/web
+        run: npm ci && npm run typecheck && npm run build
+
+  evals:
+    # Agent behavior evals and grader calibration call the real Claude API.
+    needs: test
+    runs-on: ubuntu-latest
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+    defaults:
+      run:
+        working-directory: interview-coach
+    steps:
+      - uses: actions/checkout@v4
+        if: env.ANTHROPIC_API_KEY != ''
+      - uses: astral-sh/setup-uv@v5
+        if: env.ANTHROPIC_API_KEY != ''
+      - name: Run evals
+        if: env.ANTHROPIC_API_KEY != ''
+        run: uv sync --frozen && uv run pytest -m eval -v
+      - name: Skip notice
+        if: env.ANTHROPIC_API_KEY == ''
+        run: echo "ANTHROPIC_API_KEY secret not set; skipping evals."
+        working-directory: .
