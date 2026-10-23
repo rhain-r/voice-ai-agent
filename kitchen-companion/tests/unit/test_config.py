@@ -28,3 +28,15 @@ def test_require_cartesia_key_when_selected():
     s = Settings(_env_file=None, anthropic_api_key="a", deepgram_api_key="d", tts_provider="cartesia")
     with pytest.raises(SystemExit, match="CARTESIA_API_KEY"):
         require(s, REQUIRED)
+
+
+def test_require_cartesia_voice_when_selected():
+    s = Settings(
+        _env_file=None,
+        anthropic_api_key="a",
+        deepgram_api_key="d",
+        tts_provider="cartesia",
+        cartesia_api_key="c",
+    )
+    with pytest.raises(SystemExit, match="CARTESIA_VOICE_ID"):
+        require(s, REQUIRED)
