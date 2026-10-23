@@ -19,7 +19,7 @@ from pipecat.frames.frames import (
 )
 from pipecat.processors.frame_processor import FrameDirection, FrameProcessor
 
-from kitchen_companion.timers import speak_duration, timer_phrase
+from kitchen_companion.timers import cancel_reply, remaining_reply, started_reply
 
 if TYPE_CHECKING:
     from kitchen_companion.events import EventSink, TurnPath
@@ -235,15 +235,6 @@ def parse(text: str) -> Intent | None:
 # -- the router processor ------------------------------------------------------------------------
 
 
-def _the_timer(label: str) -> str:
-    phrase = timer_phrase(label)
-    return phrase if phrase.lower().startswith("timer") else f"the {phrase}"
-
-
-def _sentence(text: str) -> str:
-    return text[:1].upper() + text[1:]
-
-
 class FastPathRouter(FrameProcessor):
     """Answers matched commands from code and hands everything else on to the LLM.
 
@@ -310,21 +301,12 @@ class FastPathRouter(FrameProcessor):
         if kind == "timer_start":
             return await self._start_timer(intent.minutes or 0, intent.label or recipe.timer_label())
         if kind == "timer_cancel":
-            result = timers.cancel(intent.label)
-            if result.ambiguous:
-                return "Which timer — " + " or ".join(result.ambiguous) + "?"
-            if not result.cancelled:
-                if intent.label and timers.list():
-                    return f"I don't see {_the_timer(intent.label)}."
-                return "There's no timer running."
-            await self._sink.timers(timers.snapshot())
-            return f"Cancelled {_the_timer(result.cancelled[0].label)}."
+            reply, changed = cancel_reply(timers, intent.label)
+            if changed:
+                await self._sink.timers(timers.snapshot())
+            return reply
         if kind == "timer_query":
-            left = timers.remaining(intent.label)
-            if not left:
-                return "No timers running."
-            lines = (f"{_the_timer(t.label)} has {speak_duration(secs)} left." for t, secs in left)
-            return " ".join(_sentence(line) for line in lines)
+            return remaining_reply(timers, intent.label)
         if kind == "yes":
             if recipe.pending_timer_offer is None:
                 return False
@@ -345,4 +327,4 @@ class FastPathRouter(FrameProcessor):
     async def _start_timer(self, minutes: float, label: str | None) -> str:
         timer = self._timers.start(minutes, label)
         await self._sink.timers(self._timers.snapshot())
-        return _sentence(f"{timer_phrase(timer.label)} set for {speak_duration(minutes * 60)}.")
+        return started_reply(timer)

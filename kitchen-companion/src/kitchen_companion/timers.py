@@ -197,6 +197,42 @@ def timer_phrase(label: str) -> str:
     return label if label.lower().startswith("timer") else f"{label} timer"
 
 
+def the_timer(label: str) -> str:
+    """"rice" -> "the rice timer", "timer 2" -> "timer 2"."""
+    phrase = timer_phrase(label)
+    return phrase if phrase.lower().startswith("timer") else f"the {phrase}"
+
+
+def sentence(text: str) -> str:
+    return text[:1].upper() + text[1:]
+
+
+# Spoken replies shared by the fast path and the LLM tools, so both say the same thing.
+
+
+def started_reply(timer: Timer) -> str:
+    return sentence(f"{timer_phrase(timer.label)} set for {speak_duration(timer.minutes * 60)}.")
+
+
+def cancel_reply(service: TimerService, label: str | None) -> tuple[str, bool]:
+    """The reply to "cancel the (label) timer", and whether a timer was actually cancelled."""
+    result = service.cancel(label)
+    if result.ambiguous:
+        return "Which timer — " + " or ".join(result.ambiguous) + "?", False
+    if not result.cancelled:
+        if label and service.list():
+            return f"I don't see {the_timer(label)}.", False
+        return "There's no timer running.", False
+    return f"Cancelled {the_timer(result.cancelled[0].label)}.", True
+
+
+def remaining_reply(service: TimerService, label: str | None = None) -> str:
+    left = service.remaining(label)
+    if not left:
+        return "No timers running."
+    return " ".join(sentence(f"{the_timer(t.label)} has {speak_duration(secs)} left.") for t, secs in left)
+
+
 def _join(items: list[str]) -> str:
     return items[0] if len(items) == 1 else ", ".join(items[:-1]) + " and " + items[-1]
 
