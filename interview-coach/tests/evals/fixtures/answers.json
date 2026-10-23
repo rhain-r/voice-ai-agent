@@ -1,0 +1,20 @@
+[
+  {
+    "question": "Tell me about a project that didn't go as planned. What happened, and what did you do?",
+    "competency": "failure",
+    "strong": "Last spring I owned the migration of our weekly revenue report from spreadsheets to dbt. Two weeks before launch, finance found the new numbers were about four percent lower than the old ones. I traced it to refunds: the spreadsheet counted them in the month of the original sale, our models counted them in the month of the refund. I wrote up both definitions, got finance and sales to agree on the refund-month rule in one meeting, and added a reconciliation test that compares the two totals every week. We launched one week late, the report has matched finance's close for six straight months, and the team now writes a definitions doc before any migration.",
+    "weak": "Yeah, so we had this project and it kind of went sideways because of some data stuff. There were issues with the numbers and people weren't happy. We all worked on it together and eventually it got sorted out. I think it went fine in the end and we learned a lot as a team."
+  },
+  {
+    "question": "Tell me about a time you disagreed with a teammate. How did you handle it?",
+    "competency": "conflict",
+    "strong": "A senior engineer on my team wanted to cache our search results for an hour to cut database load. I thought an hour was too long because prices change several times a day. Instead of arguing in the channel, I pulled a week of logs and showed that eighty percent of the load came from the same two hundred queries, and that prices for those changed on average every ninety minutes. I proposed a ten-minute cache with invalidation on price updates. He agreed after seeing the data, load dropped by sixty percent, and we haven't had a single stale-price complaint. We still pair on performance work.",
+    "weak": "I usually get along with everyone, so I don't really have big disagreements. Sometimes people have different opinions, and I just try to understand where they're coming from and find a middle ground. Communication is really important."
+  },
+  {
+    "question": "Tell me about a time you had more work than you could finish. How did you decide what to drop?",
+    "competency": "prioritization",
+    "strong": "During quarter-end I had five dashboard requests and capacity for about two. I listed each one with who asked, what decision it would inform, and the deadline for that decision. Two fed the board meeting that Friday, so they came first. For the other three, I told the requesters directly that they'd slip a week and offered a quick SQL query as a stopgap for one of them. Both board dashboards shipped on Thursday, nobody escalated, and my manager now uses the same decision-and-deadline list for team intake.",
+    "weak": "I just worked really hard and stayed late to get as much done as possible. I tried to do everything, and most things got done eventually. Time management is something I'm always working on."
+  }
+]
