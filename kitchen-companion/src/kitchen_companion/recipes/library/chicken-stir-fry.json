@@ -1,0 +1,45 @@
+{
+  "id": "chicken-stir-fry",
+  "title": "Chicken Stir-Fry",
+  "servings": 4,
+  "total_time_min": 30,
+  "ingredients": [
+    "1 lb boneless chicken thighs, thinly sliced",
+    "3 tbsp soy sauce",
+    "1 tbsp cornstarch",
+    "1 tbsp honey",
+    "1 tsp sesame oil",
+    "2 tbsp vegetable oil",
+    "2 cups broccoli florets",
+    "1 red bell pepper, sliced",
+    "3 cloves garlic, minced",
+    "1 tbsp grated fresh ginger",
+    "2 green onions, sliced"
+  ],
+  "steps": [
+    {
+      "text": "Toss the chicken with one tablespoon of the soy sauce and the cornstarch, and marinate for 10 minutes.",
+      "timer_minutes": 10
+    },
+    {
+      "text": "Stir the rest of the soy sauce together with the honey and sesame oil."
+    },
+    {
+      "text": "Heat the vegetable oil in a wok or large skillet over high heat."
+    },
+    {
+      "text": "Sear the chicken for 5 minutes, until browned and cooked through, then set it aside.",
+      "timer_minutes": 5
+    },
+    {
+      "text": "Stir-fry the broccoli and bell pepper for 3 minutes.",
+      "timer_minutes": 3
+    },
+    {
+      "text": "Add the garlic and ginger and cook for 30 seconds."
+    },
+    {
+      "text": "Return the chicken, pour in the sauce, and toss until glossy. Top with the green onions."
+    }
+  ]
+}

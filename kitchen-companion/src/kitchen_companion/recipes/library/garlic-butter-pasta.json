@@ -1,0 +1,41 @@
+{
+  "id": "garlic-butter-pasta",
+  "title": "Garlic Butter Pasta",
+  "servings": 4,
+  "total_time_min": 25,
+  "ingredients": [
+    "12 oz spaghetti",
+    "6 tbsp unsalted butter",
+    "6 cloves garlic, minced",
+    "1/4 tsp red pepper flakes",
+    "1/2 cup grated parmesan",
+    "1/2 cup reserved pasta water",
+    "2 tbsp chopped fresh parsley",
+    "1 tsp salt"
+  ],
+  "steps": [
+    {
+      "text": "Bring a large pot of salted water to a boil."
+    },
+    {
+      "text": "Boil the spaghetti for 10 minutes, until al dente.",
+      "timer_minutes": 10
+    },
+    {
+      "text": "Scoop out half a cup of the pasta water, then drain the spaghetti."
+    },
+    {
+      "text": "Melt the butter in a large skillet over medium-low heat."
+    },
+    {
+      "text": "Add the garlic and red pepper flakes and cook for 2 minutes, until fragrant.",
+      "timer_minutes": 2
+    },
+    {
+      "text": "Toss in the spaghetti, the pasta water and the parmesan until glossy."
+    },
+    {
+      "text": "Season with the salt, scatter the parsley on top, and serve right away."
+    }
+  ]
+}
