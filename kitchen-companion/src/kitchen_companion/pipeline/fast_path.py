@@ -7,7 +7,24 @@ commands may be longer but must say "timer" (or ask how long is left) and, to st
 
 import re
 from dataclasses import dataclass
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
+
+from pipecat.frames.frames import (
+    BotStartedSpeakingFrame,
+    BotStoppedSpeakingFrame,
+    Frame,
+    LLMMessagesAppendFrame,
+    TranscriptionFrame,
+    TTSSpeakFrame,
+)
+from pipecat.processors.frame_processor import FrameDirection, FrameProcessor
+
+from kitchen_companion.timers import speak_duration, timer_phrase
+
+if TYPE_CHECKING:
+    from kitchen_companion.events import EventSink, TurnPath
+    from kitchen_companion.recipes.state import RecipeSession
+    from kitchen_companion.timers import TimerService
 
 IntentKind = Literal[
     "next", "prev", "repeat", "goto", "stop", "timer_start", "timer_cancel", "timer_query", "yes", "no", "ack"
@@ -213,3 +230,119 @@ def parse(text: str) -> Intent | None:
     if m:
         return Intent("goto", n=_ORDINALS.index(m.group(1)) + 1)
     return _timer_intent(t)
+
+
+# -- the router processor ------------------------------------------------------------------------
+
+
+def _the_timer(label: str) -> str:
+    phrase = timer_phrase(label)
+    return phrase if phrase.lower().startswith("timer") else f"the {phrase}"
+
+
+def _sentence(text: str) -> str:
+    return text[:1].upper() + text[1:]
+
+
+class FastPathRouter(FrameProcessor):
+    """Answers matched commands from code and hands everything else on to the LLM.
+
+    A handled command speaks its reply (kept out of the context by the TTS) and appends the
+    user/assistant exchange to the LLM context directly, so Claude knows what happened.
+    """
+
+    def __init__(self, recipe: "RecipeSession", timers: "TimerService", sink: "EventSink", path: "TurnPath"):
+        super().__init__()
+        self._recipe = recipe
+        self._timers = timers
+        self._sink = sink
+        self._path = path
+        self._bot_speaking = False
+
+    async def process_frame(self, frame: Frame, direction: FrameDirection):
+        await super().process_frame(frame, direction)
+
+        if isinstance(frame, BotStartedSpeakingFrame):
+            self._bot_speaking = True
+        elif isinstance(frame, BotStoppedSpeakingFrame):
+            self._bot_speaking = False
+
+        if direction == FrameDirection.DOWNSTREAM and isinstance(frame, TranscriptionFrame):
+            intent = parse(frame.text)
+            if intent is not None and await self._handle(intent, frame.text):
+                return
+        await self.push_frame(frame, direction)
+
+    async def _handle(self, intent: Intent, text: str) -> bool:
+        """Run the command. False means it doesn't apply right now and the LLM should hear it."""
+        reply = await self._reply(intent)
+        if reply is False:
+            return False
+        # Kitchen noise doesn't cut the bot off: only a stop word or a command of 2+ words does.
+        if intent.kind == "stop" or (self._bot_speaking and len(text.split()) >= 2):
+            await self.broadcast_interruption()
+        if reply:
+            self._path.value = "fast"
+            await self.push_frame(TTSSpeakFrame(reply, append_to_context=False))
+            await self.push_frame(
+                LLMMessagesAppendFrame(
+                    messages=[{"role": "user", "content": text}, {"role": "assistant", "content": reply}],
+                    run_llm=False,
+                )
+            )
+        return True
+
+    async def _reply(self, intent: Intent) -> str | None | Literal[False]:
+        """The spoken reply, None for a silent command, or False when the command doesn't apply."""
+        recipe, timers = self._recipe, self._timers
+        kind = intent.kind
+        if kind in ("next", "prev", "repeat", "goto"):
+            if kind == "goto":
+                reply = recipe.goto(intent.n or 1)
+            else:
+                reply = {"next": recipe.next, "prev": recipe.prev, "repeat": recipe.repeat}[kind]()
+            await self._sink.recipe_state(recipe.snapshot())
+            return reply
+        if kind == "stop":
+            if timers.acknowledge():
+                await self._sink.timers(timers.snapshot())
+            return None
+        if kind == "timer_start":
+            return await self._start_timer(intent.minutes or 0, intent.label or recipe.timer_label())
+        if kind == "timer_cancel":
+            result = timers.cancel(intent.label)
+            if result.ambiguous:
+                return "Which timer — " + " or ".join(result.ambiguous) + "?"
+            if not result.cancelled:
+                if intent.label and timers.list():
+                    return f"I don't see {_the_timer(intent.label)}."
+                return "There's no timer running."
+            await self._sink.timers(timers.snapshot())
+            return f"Cancelled {_the_timer(result.cancelled[0].label)}."
+        if kind == "timer_query":
+            left = timers.remaining(intent.label)
+            if not left:
+                return "No timers running."
+            lines = (f"{_the_timer(t.label)} has {speak_duration(secs)} left." for t, secs in left)
+            return " ".join(_sentence(line) for line in lines)
+        if kind == "yes":
+            if recipe.pending_timer_offer is None:
+                return False
+            minutes, recipe.pending_timer_offer = recipe.pending_timer_offer, None
+            return await self._start_timer(minutes, recipe.timer_label())
+        if kind == "no":
+            if recipe.pending_timer_offer is None:
+                return False
+            recipe.pending_timer_offer = None
+            return "Okay."
+        if kind == "ack":
+            if not timers.acknowledge():
+                return False
+            await self._sink.timers(timers.snapshot())
+            return "Got it."
+        return False
+
+    async def _start_timer(self, minutes: float, label: str | None) -> str:
+        timer = self._timers.start(minutes, label)
+        await self._sink.timers(self._timers.snapshot())
+        return _sentence(f"{timer_phrase(timer.label)} set for {speak_duration(minutes * 60)}.")

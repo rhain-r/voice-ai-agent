@@ -2,7 +2,13 @@ import asyncio
 
 import pytest
 
-from kitchen_companion.timers import AnnouncementGate, TimerService, announcement_text, timer_phrase
+from kitchen_companion.timers import (
+    AnnouncementGate,
+    TimerService,
+    announcement_text,
+    speak_duration,
+    timer_phrase,
+)
 
 
 class FakeClock:
@@ -217,3 +223,21 @@ def test_snapshot_epoch(clk):
     assert svc.snapshot() == [
         {"id": timer.id, "label": "timer 1", "state": "running", "minutes": 2, "ends_at_epoch": 1120.0}
     ]
+
+
+@pytest.mark.parametrize(
+    "seconds,expected",
+    [
+        (480, "eight minutes"),
+        (90, "one minute and thirty seconds"),
+        (60, "one minute"),
+        (45, "forty-five seconds"),
+        (1, "one second"),
+        (0.4, "less than a second"),
+        (3600, "one hour"),
+        (5400, "one hour and thirty minutes"),
+        (299.6, "five minutes"),
+    ],
+)
+def test_speak_duration(seconds, expected):
+    assert speak_duration(seconds) == expected

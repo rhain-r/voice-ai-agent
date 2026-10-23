@@ -14,6 +14,8 @@ from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from typing import Literal
 
+from kitchen_companion.recipes.units import number_words
+
 logger = logging.getLogger(__name__)
 
 TimerState = Literal["running", "due", "acknowledged", "cancelled"]
@@ -173,6 +175,21 @@ class AnnouncementGate:
             return True
         except TimeoutError:
             return False
+
+
+def speak_duration(seconds: float) -> str:
+    """480 -> "eight minutes", 90 -> "one minute and thirty seconds". Rounded to the second."""
+    total = round(seconds)
+    if total <= 0:
+        return "less than a second"
+    hours, rest = divmod(total, 3600)
+    minutes, secs = divmod(rest, 60)
+    parts = [
+        f"{number_words(n)} {unit if n == 1 else unit + 's'}"
+        for n, unit in ((hours, "hour"), (minutes, "minute"), (secs, "second"))
+        if n
+    ]
+    return " and ".join(parts) if len(parts) <= 2 else f"{parts[0]}, {parts[1]} and {parts[2]}"
 
 
 def timer_phrase(label: str) -> str:

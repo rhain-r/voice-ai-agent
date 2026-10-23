@@ -32,6 +32,8 @@ asyncio_default_fixture_loop_scope = "function"
 testpaths = ["tests"]
 markers = ["eval: needs ANTHROPIC_API_KEY"]
 addopts = "-m 'not eval'"
+# pipecat imports the stdlib audioop module, which warns on 3.12; it's not ours to fix.
+filterwarnings = ["ignore:'audioop' is deprecated:DeprecationWarning"]
 
 [tool.ruff]
 line-length = 110
