@@ -25,7 +25,7 @@ jobs:
           cache-dependency-path: interview-coach/web/package-lock.json
       - name: Web typecheck and build
         working-directory: interview-coach/web
-        run: npm ci && npm run typecheck && npm run build
+        run: npm ci && npm test && npm run typecheck && npm run build
 
   evals:
     # Agent behavior evals and grader calibration call the real Claude API.

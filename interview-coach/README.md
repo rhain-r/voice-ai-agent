@@ -13,7 +13,7 @@ Built with **LiveKit Agents**, **Claude**, **Deepgram**, an **MCP** question ban
 | **Latency** | Claude starts drafting before you've definitely finished (preemptive generation). Live turns run Sonnet 5.5 with thinking off and low effort. Every reply's delay is measured and shown. | `agent/llm.py`, `agent/telemetry.py` |
 | **Sounding like an interviewer, not a chatbot** | One question at a time, short turns, no feedback mid-interview, follow-ups that probe what's missing (usually the result). Markdown and URLs are stripped before speech. | `agent/prompts.py`, `agent/speakable.py` |
 | **Feedback a text chatbot can't give** | Deepgram keeps "um" and "uh" and word timings, so each answer gets pace, filler rate, longest pause and thinking time. | `agent/analytics.py` |
-| **Grading you can trust** | Each answer is graded separately against a rubric by Claude Opus 5.5 with structured output; quotes must be the candidate's own words; a calibration eval checks a strong answer beats a weak one. | `scorecard/graph.py`, `tests/evals/` |
+| **Grading you can trust** | Each answer is graded separately, with the interviewer's follow-ups in view, against a rubric that fits the question type. Claude Opus 5.5 returns structured output; quotes must be the candidate's own words; a skipped question ("pass") is listed as skipped, not scored; a calibration eval checks a strong answer beats a weak one. | `scorecard/graph.py`, `tests/evals/` |
 | **Things going wrong** | Claude and text-to-speech fall back to a second provider mid-call, the question bank falls back to a bundled copy, a dropped call still produces a partial scorecard, and a failed upload is retried then saved to disk. | `agent/worker.py`, `agent/completion.py` |
 
 ## Why it's built this way
@@ -120,7 +120,7 @@ Set `OTEL_EXPORTER_OTLP_ENDPOINT` to send LiveKit's OpenTelemetry spans (speech-
 uv run pytest
 ```
 
-This runs 97 unit tests in about 20 seconds with no API keys: analytics, the question bank and MCP server, the LangGraph pipeline with a fake grader, the API, latency tracking, completion delivery and turn-taking settings.
+This runs 116 unit tests in about 20 seconds with no API keys: analytics, the question bank and MCP server, the LangGraph pipeline with a fake grader (including skipped answers and per-question rubrics), the API, latency tracking, completion delivery and turn-taking settings.
 
 ```bash
 uv run pytest -m eval
@@ -137,8 +137,10 @@ This runs against the real Claude API and needs `ANTHROPIC_API_KEY`. It includes
 It also includes a grader calibration check: across three fixture pairs, the strong answer must beat the weak one by at least 15 points on average over three runs.
 
 ```bash
-npm --prefix web run typecheck && npm --prefix web run build
+npm --prefix web test && npm --prefix web run typecheck && npm --prefix web run build
 ```
+
+The web tests (Node's built-in test runner) cover what the live page and the report show in each state.
 
 CI (`.github/workflows/interview-coach.yml`) runs the unit tests, lint and web build on every change, and runs the evals when the `ANTHROPIC_API_KEY` secret is set.
 
