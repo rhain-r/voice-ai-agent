@@ -40,12 +40,13 @@ def ask(anthropic_tools):
             {"role": "user" if i % 2 == 0 else "assistant", "content": text + (note if i % 2 == 0 else "")}
             for i, text in enumerate(turns)
         ]
-        # Match what the bot sends: Pipecat passes effort "low" and leaves thinking at the model's default.
+        # Match what the bot sends (bot.make_llm): low effort with thinking off.
         return await client.messages.create(
             model=Settings(_env_file=None).llm_model,
             max_tokens=1024,
             system=SYSTEM_PROMPT,
             tools=anthropic_tools,
+            thinking={"type": "disabled"},
             output_config={"effort": "low"},
             messages=messages,
         )

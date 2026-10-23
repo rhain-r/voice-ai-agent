@@ -58,7 +58,11 @@ class Kitchen:
         if is_reminder:
             queued = {t.id for batch, _ in self._pending for t in batch}
             if all(t.id in queued for t in timers):
-                return  # the queued "is done" already covers it
+                # The queued "is done" already covers it, and nobody heard this reminder,
+                # so give it back: reminders resume after the next connection hears "done".
+                for t in timers:
+                    t.reminders = max(0, t.reminders - 1)
+                return
         self._pending.append((timers, is_reminder))
 
 

@@ -33,6 +33,7 @@ _MARKDOWN = [
     (re.compile(r"^\s*#{1,6}\s+", re.MULTILINE), ""),
     (re.compile(r"^\s*(?:[-*•]|\d+\.)\s+", re.MULTILINE), ""),
 ]
+_THOUSANDS = re.compile(r"(?<=\d),(?=\d{3}(?!\d))")  # "1,000" -> "1000"
 _TEMP = re.compile(rf"(?<![\w/])({_NUM})\s*°\s*([FC])?\b")
 _RANGE = re.compile(rf"(?<![\w/])({_NUM})\s*[-–—]\s*({_NUM})(?:\s*([A-Za-z]+)\b\.?)?")
 _QTY_UNIT = re.compile(rf"(?<![\w/])({_NUM})\s*([A-Za-z]+)\b(\.?)")
@@ -87,6 +88,7 @@ def _number(m: re.Match[str]) -> str:
 def normalize(text: str) -> str:
     for pattern, repl in _MARKDOWN:
         text = pattern.sub(repl, text)
+    text = _THOUSANDS.sub("", text)
     text = _UNICODE_RE.sub(lambda m: f"{m.group(1)} {_UNICODE[m.group(2)]}".strip(), text)
     text = _TEMP.sub(_temp, text)
     text = _RANGE.sub(_range, text)

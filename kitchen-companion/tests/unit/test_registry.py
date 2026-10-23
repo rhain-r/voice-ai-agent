@@ -119,3 +119,14 @@ async def test_stale_detach_keeps_new_connection(registry):
 )
 def test_kitchen_id_re(kid, ok):
     assert bool(re.match(KITCHEN_ID_RE, kid)) is ok
+
+
+async def test_reminders_not_spent_while_nobody_is_listening(registry):
+    kitchen = registry.get_or_create("kitchen-abc123")
+    pasta = kitchen.timers.start(1, "pasta")
+    pasta.state, pasta.reminders = "due", 0
+    await kitchen.on_due([pasta], False)
+    for _ in range(3):  # TimerService counts each reminder before calling on_due
+        pasta.reminders += 1
+        await kitchen.on_due([pasta], True)
+    assert pasta.reminders == 0  # all three are still owed to the next connection

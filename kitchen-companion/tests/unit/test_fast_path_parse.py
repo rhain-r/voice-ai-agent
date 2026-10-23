@@ -91,6 +91,10 @@ MUST_NOT_MATCH = [
     "set a timer",
     "what's the next ingredient",
     "go back to the oven",
+    "when does the timer end",
+    "when will the timer go off",
+    "how do I reset the timer",
+    "the timer says 5 minutes left",
     "",
     "   ",
 ]

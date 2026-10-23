@@ -191,10 +191,13 @@ keeps the spec's behaviour was made:
 3. **The state note moved.** `StateNoteInjector` sits after the user aggregator and annotates the
    context's latest user message, instead of rewriting the transcript before it. Otherwise the note
    would count toward the two-word interruption threshold.
-4. **Evals match production thinking.** With `effort="low"` set, Pipecat 1.13 doesn't send its
-   lowest-thinking default, so the bot runs Haiku 5.5 with adaptive thinking at low effort. The
-   evals send the same (`output_config.effort="low"`, no `thinking`) instead of the plan's
-   `thinking: disabled`.
+4. **Thinking is turned off explicitly.** The plan said to set `effort="low"` and leave `thinking`
+   unset so Pipecat would send its lowest setting, but Pipecat 1.13 only sends that default when
+   *neither* is set. The bot therefore passes `thinking=ThinkingConfig(type="disabled")` alongside
+   `effort="low"` (Pipecat's own lowest setting for Haiku 5.5), and the evals send the same.
+   The first user turn in the context is also guaranteed: when the conversation opens with Chef
+   speaking (a recipe picked by touch, a timer going off), `StateNoteInjector` puts a short
+   placeholder user turn first, because the Messages API wants the first turn to be the user's.
 5. **Deepgram keyterms.** Verified in `pipecat/services/deepgram/stt.py`: an
    `STTUpdateSettingsFrame` with new keyterms reconnects the Deepgram stream, so there is no
    rebuild-on-next-connection fallback.
@@ -202,12 +205,16 @@ keeps the spec's behaviour was made:
    an open turn) and the bot to be quiet, up to 20 seconds, so the timer loop never blocks. The plan
    fed the gate from user-turn frames only, which miss conversation the gate overheard.
 7. **Kitchen registry details.** `Kitchen.attach` is async (it replays announcements that came due
-   while disconnected), a stale connection's `detach` doesn't unhook its replacement, and a
-   connected kitchen is never pruned.
+   while disconnected) and runs when the tablet's RTVI client reports ready, so replayed speech
+   isn't sent before the peer can carry audio. Reminders skipped while nobody was connected aren't
+   used up. A stale connection's `detach` doesn't unhook its replacement, and a connected kitchen is
+   never pruned.
 8. **Small additions.** `TimerService.list()` (used by the plan's own router test and listed in the
    spec), an injectable sleeper, `CARTESIA_VOICE_ID` (Cartesia has no default voice), `WEB_DIST`,
    a 3-second continuation window so a second speech-to-text final of the same addressed sentence
-   isn't dropped, and an 8-second LLM watchdog that also cancels a late answer.
+   isn't dropped, a 10-second expiry on the Hey Chef button, an 8-second LLM watchdog that also
+   cancels a late answer, and `empty_user_turn=None` on the user aggregator: a turn whose words the
+   fast path answered ends empty, and Pipecat's default would otherwise ask the LLM to respond.
 9. **Wording.** "Three steps." and "Want an eight-minute timer?" read naturally where the plan's
    f-strings gave "three steps" mid-sentence and "a eight-minute"; default timer labels say
    "Your timer 1 is done", not "Your timer 1 timer is done".

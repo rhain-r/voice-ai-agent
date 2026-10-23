@@ -29,6 +29,8 @@ STOP_WORDS = ("stop", "wait", "quiet", "be quiet", "hold on", "pause")
 
 # After an engaged line, the rest of the same utterance (a second STT final) still gets through.
 CONTINUATION_S = 3.0
+# A tap on "Hey Chef" is for the next thing said soon after, not a remark minutes later.
+BUTTON_TTL_S = 10.0
 
 Reason = Literal["wake", "followup", "button", "stop_word", "not_addressed", "empty"]
 
@@ -100,12 +102,16 @@ class AttentionGate(FrameProcessor):
         self._clock = clock
         self._continuation_s = continuation_s
         self._window_open_until = float("-inf")
-        self._button_armed = False
+        self._button_until = float("-inf")
         self.bot_speaking = False
 
+    @property
+    def _button_armed(self) -> bool:
+        return self._clock() <= self._button_until
+
     def arm_button(self) -> None:
-        """The big "Hey Chef" button: the next utterance is addressed to the bot."""
-        self._button_armed = True
+        """The big "Hey Chef" button: the next utterance (within a few seconds) is addressed to the bot."""
+        self._button_until = self._clock() + BUTTON_TTL_S
 
     def open_window(self, seconds: float | None = None) -> None:
         span = self._cfg.followup_window_s if seconds is None else seconds
@@ -146,7 +152,7 @@ class AttentionGate(FrameProcessor):
                 await self._sink.overheard(frame.text)
             return
 
-        self._button_armed = False
+        self._button_until = float("-inf")
         if not decision.text:
             await self.push_frame(TTSSpeakFrame("Yes?", append_to_context=False))
             self.open_window()

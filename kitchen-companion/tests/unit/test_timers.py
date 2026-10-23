@@ -6,6 +6,7 @@ from kitchen_companion.timers import (
     AnnouncementGate,
     TimerService,
     announcement_text,
+    remaining_reply,
     speak_duration,
     timer_phrase,
 )
@@ -241,3 +242,17 @@ def test_snapshot_epoch(clk):
 )
 def test_speak_duration(seconds, expected):
     assert speak_duration(seconds) == expected
+
+
+def test_remaining_reply_named_miss_while_others_run(t):
+    t.start(5, "pasta")
+    t.start(3, "sauce")
+    assert remaining_reply(t, "chicken") == "I don't see the chicken timer."
+    assert remaining_reply(make_empty(), "chicken") == "No timers running."
+
+
+def make_empty() -> TimerService:
+    async def on_due(timers, is_reminder):
+        pass
+
+    return TimerService(on_due)

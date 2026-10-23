@@ -11,8 +11,10 @@ from pipecat.frames.frames import (
 )
 from pipecat.pipeline.pipeline import Pipeline
 from pipecat.processors.aggregators.llm_context import LLMContext
-from pipecat.tests.utils import run_test
+from pipecat.processors.aggregators.llm_response_universal import LLMContextAggregatorPair
+from pipecat.tests.utils import SleepFrame, run_test
 
+from kitchen_companion.bot import user_params
 from kitchen_companion.events import TurnPath
 from kitchen_companion.pipeline.attention import AttentionConfig, AttentionGate
 from kitchen_companion.pipeline.fast_path import FastPathRouter
@@ -280,3 +282,59 @@ async def test_state_note_no_recipe():
     context = LLMContext(messages=[{"role": "user", "content": "find me a soup"}])
     await run_test(StateNoteInjector(RecipeSession()), frames_to_send=[LLMContextFrame(context=context)])
     assert context.messages[-1]["content"].endswith("[kitchen state: no recipe loaded]")
+
+
+async def test_state_note_starts_context_with_a_user_turn():
+    """A touch-loaded recipe or a timer announcement can be the first thing in the context."""
+    recipe = loaded_session()
+    context = LLMContext(
+        messages=[
+            {"role": "system", "content": "sys"},
+            {"role": "assistant", "content": "Okay — Test. Three steps. Step one: Whisk the flour."},
+            {"role": "user", "content": "how much garlic"},
+        ]
+    )
+    await run_test(StateNoteInjector(recipe), frames_to_send=[LLMContextFrame(context=context)])
+    roles = [m["role"] for m in context.messages]
+    assert roles == ["system", "user", "assistant", "user"]
+    await run_test(StateNoteInjector(recipe), frames_to_send=[LLMContextFrame(context=context)])
+    assert [m["role"] for m in context.messages] == roles  # added once
+
+
+class FakeClock:
+    def __init__(self):
+        self.now = 100.0
+
+    def __call__(self):
+        return self.now
+
+
+async def test_button_arm_expires():
+    sink, clock = make_sink(), FakeClock()
+    gate = AttentionGate(AttentionConfig(), sink, clock=clock)
+    gate.arm_button()
+    clock.now += 30  # tapped, then nobody spoke to Chef
+    await run_test(gate, frames_to_send=[tf("did you call your mom back")], expected_down_frames=[])
+    assert sink.overheard == ["did you call your mom back"]
+
+
+async def test_fast_path_command_over_bot_doesnt_run_llm(rig):
+    """An interim can open a user turn whose final the router then answers: that turn ends empty."""
+    rig.gate.open_window()
+    timer = rig.timers.start(1, "pasta")
+    timer.state = "due"
+    context = LLMContext(messages=[{"role": "system", "content": "sys"}])
+    aggregators = LLMContextAggregatorPair(context, user_params=user_params(stop_timeout=0.2))
+    interim = InterimTranscriptionFrame(text="got it", user_id="u", timestamp="now")
+    down, _ = await run_test(
+        Pipeline([rig.gate, rig.router, aggregators.user()]),
+        frames_to_send=[
+            BotStartedSpeakingFrame(),
+            interim,
+            SleepFrame(sleep=0.2),
+            tf("got it"),
+            SleepFrame(sleep=0.8),
+        ],
+    )
+    assert any(isinstance(f, TTSSpeakFrame) and f.text == "Got it." for f in down)
+    assert not any(isinstance(f, LLMContextFrame) for f in down)

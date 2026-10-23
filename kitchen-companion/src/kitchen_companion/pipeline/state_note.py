@@ -6,6 +6,9 @@ from pipecat.processors.frame_processor import FrameDirection, FrameProcessor
 from kitchen_companion.recipes.state import RecipeSession
 
 NOTE_PREFIX = "[kitchen state:"
+# Stands in for the cook's first turn when the conversation opened with Chef speaking (a recipe
+# picked by touch, a timer going off): the Messages API wants the first turn to be the user's.
+OPENING_TURN = "(The cook started on the tablet screen.)"
 
 
 def state_note(recipe: RecipeSession) -> str:
@@ -14,6 +17,17 @@ def state_note(recipe: RecipeSession) -> str:
     r = recipe.recipe
     step = f"step {recipe.index + 1} of {len(r.steps)}"
     return f"recipe '{r.title}', {step}, scaled for {recipe.servings} servings"
+
+
+def _user_first(messages: list) -> list:
+    for i, message in enumerate(messages):
+        role = message.get("role") if isinstance(message, dict) else None
+        if role in ("system", "developer"):
+            continue
+        if role == "assistant":
+            return [*messages[:i], {"role": "user", "content": OPENING_TURN}, *messages[i:]]
+        break
+    return messages
 
 
 class StateNoteInjector(FrameProcessor):
@@ -34,6 +48,7 @@ class StateNoteInjector(FrameProcessor):
         await self.push_frame(frame, direction)
 
     def _annotate(self, frame: LLMContextFrame) -> None:
+        frame.context.transform_messages(_user_first)
         for message in reversed(frame.context.messages):
             if not isinstance(message, dict) or message.get("role") != "user":
                 continue

@@ -6,6 +6,7 @@ from types import SimpleNamespace
 from pipecat.frames.frames import (
     BotStartedSpeakingFrame,
     BotStoppedSpeakingFrame,
+    InterruptionFrame,
     LLMContextFrame,
     LLMFullResponseStartFrame,
     UserStartedSpeakingFrame,
@@ -17,7 +18,16 @@ from pipecat.observers.base_observer import FramePushed
 from pipecat.processors.aggregators.llm_context import LLMContext
 from pipecat.processors.frame_processor import FrameDirection
 
-from kitchen_companion.bot import Announcer, ClientActions, LLMWatchdog, SpeakingObserver, keyterms
+from kitchen_companion.bot import (
+    Announcer,
+    ClientActions,
+    LLMWatchdog,
+    SpeakingObserver,
+    client_ready,
+    keyterms,
+    make_llm,
+)
+from kitchen_companion.config import Settings
 from kitchen_companion.recipes.library import Library
 from kitchen_companion.timers import AnnouncementGate
 from tests.fakes import fixture_recipe, loaded_session, make_sink, make_timers
@@ -111,9 +121,48 @@ async def test_llm_watchdog_fires_when_no_first_token():
         stalls.append(1)
 
     dog = LLMWatchdog(llm, timeout_s=0.05, on_stall=on_stall)
-    await dog.on_push_frame(pushed(LLMContextFrame(context=LLMContext()), destination=llm))
+    # Observers only see a frame's first push: the user aggregator handing it to the next processor.
+    await dog.on_push_frame(pushed(LLMContextFrame(context=LLMContext()), destination=object()))
     await asyncio.sleep(0.1)
     assert stalls == [1]
+
+
+async def test_llm_watchdog_disarmed_by_interruption():
+    llm = object()
+    stalls = []
+
+    async def on_stall():
+        stalls.append(1)
+
+    dog = LLMWatchdog(llm, timeout_s=0.05, on_stall=on_stall)
+    await dog.on_push_frame(pushed(LLMContextFrame(context=LLMContext()), destination=object()))
+    await dog.on_push_frame(pushed(InterruptionFrame()))  # the user cut in; no answer is coming
+    await asyncio.sleep(0.1)
+    assert stalls == []
+
+
+def test_llm_runs_haiku_low_effort_without_thinking():
+    llm = make_llm(Settings(_env_file=None, anthropic_api_key="a", deepgram_api_key="d"))
+    settings = llm._settings  # noqa: SLF001 - the request settings are what the constraint is about
+    assert settings.model == "claude-haiku-5-5"
+    assert settings.effort == "low"
+    assert settings.thinking.type == "disabled"
+
+
+async def test_client_ready_attaches_and_replays_queued_announcements():
+    from kitchen_companion.registry import Kitchen
+
+    kitchen = Kitchen("kitchen-abc123")
+    pasta = kitchen.timers.start(1, "pasta")
+    await kitchen.on_due([pasta], False)
+    sink, heard = make_sink(), []
+
+    async def announce(timers, is_reminder):
+        heard.append([t.label for t in timers])
+
+    await client_ready(kitchen, announce, sink)
+    assert heard == [["pasta"]]
+    assert sink.states and sink.timer_snapshots  # the UI gets state before the replayed speech
 
 
 async def test_llm_watchdog_disarmed_by_response():
@@ -124,11 +173,8 @@ async def test_llm_watchdog_disarmed_by_response():
         stalls.append(1)
 
     dog = LLMWatchdog(llm, timeout_s=0.05, on_stall=on_stall)
-    await dog.on_push_frame(pushed(LLMContextFrame(context=LLMContext()), destination=llm))
+    await dog.on_push_frame(pushed(LLMContextFrame(context=LLMContext()), destination=object()))
     await dog.on_push_frame(pushed(LLMFullResponseStartFrame(), source=llm))
-    await dog.on_push_frame(
-        pushed(LLMContextFrame(context=LLMContext()), destination=object())
-    )  # not to the LLM
     await asyncio.sleep(0.1)
     assert stalls == []
     await dog.close()

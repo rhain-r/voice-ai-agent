@@ -162,7 +162,13 @@ _GOTO_ORDINAL = re.compile(
 # -- timer commands ------------------------------------------------------------------------------
 
 _TIMER_WORD = re.compile(r"\btimers?\b")
-_CANCEL_WORD = re.compile(r"\b(?:cancel|stop|delete|remove|clear|kill|turn off|end|reset|dismiss)\b")
+# The verb has to come before "timer": "when does the timer end" is a question, not a command.
+_CANCEL_WORD = re.compile(
+    r"\b(?:cancel|stop|delete|remove|clear|kill|turn off|end|reset|dismiss)\b.*\btimers?\b"
+)
+# Questions and remarks about a timer are the LLM's to answer ("how do I reset the timer").
+_QUESTION_START = re.compile(r"^(?:how|what|whats|when|why|where|which|who|does|do|did|is|should)\b")
+_NOT_A_LABEL = {"left", "says", "said", "remaining", "until", "still", "already", "is", "was", "went", "ago"}
 _QUERY_START = re.compile(r"^(?:how long|how much time|how many minutes|whats left|time left|time check)\b")
 _QUERY_TARGET = re.compile(
     r"\b(?:left|remaining|until|till|til|to go|timers?)\b|^(?:how long|how much time) (?:is )?on\b"
@@ -185,19 +191,20 @@ _QUERY_FILLER = {
 _MAX_LABEL_WORDS = 3
 
 
-def _label(text: str, filler: set[str]) -> tuple[bool, str | None]:
-    """Leftover words after the command words: (ok, label). Too many leftovers means it isn't a command."""
+def _label(text: str, filler: set[str], command: bool = True) -> tuple[bool, str | None]:
+    """Leftover words after the command words: (ok, label). Too many leftovers, or (for a command)
+    words that describe a timer rather than name one ("the timer says 5 minutes left"), mean no."""
     words = [w for w in text.split() if w not in filler]
-    if len(words) > _MAX_LABEL_WORDS:
+    if len(words) > _MAX_LABEL_WORDS or (command and _NOT_A_LABEL.intersection(words)):
         return False, None
     return True, " ".join(words) or None
 
 
 def _timer_intent(text: str) -> Intent | None:
     if _QUERY_START.match(text) and _QUERY_TARGET.search(text):
-        ok, label = _label(text, _QUERY_FILLER)
+        ok, label = _label(text, _QUERY_FILLER, command=False)
         return Intent("timer_query", label=label) if ok else None
-    if not _TIMER_WORD.search(text):
+    if not _TIMER_WORD.search(text) or _QUESTION_START.match(text):
         return None
     if _CANCEL_WORD.search(text):
         ok, label = _label(text, _CANCEL_FILLER)

@@ -31,6 +31,9 @@ from kitchen_companion.pipeline.speakable import KitchenTextFilter, normalize
         ("# Tips\n- Stir often", "Tips\nStir often"),
         ("Vitamin B12 and 4 eggs", "Vitamin B12 and four eggs"),
         ("2 large eggs, medium-low heat", "two large eggs, medium-low heat"),
+        ("about 1,000 ml of stock", "about one thousand milliliters of stock"),
+        ("2,500 g flour", "two thousand five hundred grams flour"),
+        ("eggs, 2, and milk", "eggs, two, and milk"),
     ],
 )
 def test_normalize(text, expected):

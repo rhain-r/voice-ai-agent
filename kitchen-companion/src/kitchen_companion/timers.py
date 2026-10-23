@@ -229,6 +229,8 @@ def cancel_reply(service: TimerService, label: str | None) -> tuple[str, bool]:
 def remaining_reply(service: TimerService, label: str | None = None) -> str:
     left = service.remaining(label)
     if not left:
+        if label and service.list():
+            return f"I don't see {the_timer(label)}."
         return "No timers running."
     return " ".join(sentence(f"{the_timer(t.label)} has {speak_duration(secs)} left.") for t, secs in left)
 

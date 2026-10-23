@@ -159,7 +159,11 @@ class SpeakingObserver(BaseObserver):
 
 
 class LLMWatchdog(BaseObserver):
-    """Calls `on_stall` when the LLM gets a context but starts no response within the timeout."""
+    """Calls `on_stall` when a context heads for the LLM but no response starts within the timeout.
+
+    Observers see only a frame's first push (aggregator → next processor), so any LLMContextFrame
+    arms it; the pipeline has one LLM. An interruption disarms it: no answer is coming then.
+    """
 
     def __init__(self, llm: object, timeout_s: float, on_stall: Callable[[], Awaitable[None]]):
         super().__init__(observe_every_push=False)
@@ -169,10 +173,12 @@ class LLMWatchdog(BaseObserver):
         self._timer: asyncio.Task | None = None
 
     async def on_push_frame(self, data: FramePushed) -> None:
-        if isinstance(data.frame, LLMContextFrame) and data.destination is self._llm:
+        if isinstance(data.frame, LLMContextFrame):
             self._disarm()
             self._timer = asyncio.create_task(self._wait())
         elif isinstance(data.frame, LLMFullResponseStartFrame) and data.source is self._llm:
+            self._disarm()
+        elif isinstance(data.frame, InterruptionFrame):
             self._disarm()
 
     async def _wait(self) -> None:
@@ -227,6 +233,50 @@ class Announcer:
             await self._sink.timers(self._timers.snapshot())
 
 
+def user_params(vad_analyzer=None, turn_analyzer=None, stop_timeout: float = 5.0) -> LLMUserAggregatorParams:
+    """How the user aggregator decides a turn started and ended."""
+    return LLMUserAggregatorParams(
+        vad_analyzer=vad_analyzer,
+        # No VAD start strategy, so room noise never starts a turn; only lines the gate passed do,
+        # and while the bot is talking it takes two words to cut it off.
+        user_turn_strategies=UserTurnStrategies(
+            start=[MinWordsUserTurnStartStrategy(min_words=2)],
+            stop=[
+                TurnAnalyzerUserTurnStopStrategy(turn_analyzer=turn_analyzer or LocalSmartTurnAnalyzerV3())
+            ],
+        ),
+        user_turn_stop_timeout=stop_timeout,
+        # The fast path answers some lines the turn started on, so a turn ending with no transcript
+        # for the LLM is normal here, not something to "recover" by asking the user to repeat.
+        empty_user_turn=None,
+    )
+
+
+def make_llm(settings: Settings) -> AnthropicLLMService:
+    # Thinking off explicitly: Pipecat only sends its lowest-thinking default when effort is unset.
+    return AnthropicLLMService(
+        api_key=settings.anthropic_api_key,
+        settings=AnthropicLLMService.Settings(
+            model=settings.llm_model,
+            effort="low",
+            thinking=AnthropicLLMService.ThinkingConfig(type="disabled"),
+        ),
+    )
+
+
+async def client_ready(
+    kitchen: Kitchen, announce: Callable[[list[Timer], bool], Awaitable[None]], sink: EventSink
+):
+    """The tablet's RTVI client is up: send it the kitchen, then start (and catch up on) announcements.
+
+    Attaching here rather than when the pipeline starts means queued announcements aren't spoken
+    into a peer connection that can't carry audio yet.
+    """
+    await sink.recipe_state(kitchen.recipe.snapshot())
+    await sink.timers(kitchen.timers.snapshot())
+    await kitchen.attach(announce)
+
+
 def make_tts(settings: Settings):
     if settings.tts_provider == "cartesia":
         return CartesiaTTSService(
@@ -254,10 +304,7 @@ async def run_bot(
             model="nova-3", smart_format=True, keyterm=keyterms(kitchen.recipe.recipe, settings.wake_phrase)
         ),
     )
-    llm = AnthropicLLMService(
-        api_key=settings.anthropic_api_key,
-        settings=AnthropicLLMService.Settings(model=settings.llm_model, effort="low"),
-    )
+    llm = make_llm(settings)
     tts = make_tts(settings)
 
     worker: PipelineWorker | None = None
@@ -284,16 +331,7 @@ async def run_bot(
         messages=[{"role": "system", "content": SYSTEM_PROMPT}], tools=tool_schemas(handlers)
     )
     aggregators = LLMContextAggregatorPair(
-        context,
-        user_params=LLMUserAggregatorParams(
-            vad_analyzer=SileroVADAnalyzer(params=VADParams(stop_secs=0.2)),
-            # No VAD start strategy, so room noise never starts a turn; only lines the gate passed do,
-            # and while the bot is talking it takes two words to cut it off.
-            user_turn_strategies=UserTurnStrategies(
-                start=[MinWordsUserTurnStartStrategy(min_words=2)],
-                stop=[TurnAnalyzerUserTurnStopStrategy(turn_analyzer=LocalSmartTurnAnalyzerV3())],
-            ),
-        ),
+        context, user_params=user_params(vad_analyzer=SileroVADAnalyzer(params=VADParams(stop_secs=0.2)))
     )
 
     pipeline = Pipeline(
@@ -335,8 +373,7 @@ async def run_bot(
 
     @worker.rtvi.event_handler("on_client_ready")
     async def on_client_ready(_rtvi):
-        await sink.recipe_state(kitchen.recipe.snapshot())
-        await sink.timers(kitchen.timers.snapshot())
+        await client_ready(kitchen, announcer.announce, sink)
 
     @worker.rtvi.event_handler("on_client_message")
     async def on_client_message(_rtvi, message):
@@ -348,7 +385,6 @@ async def run_bot(
         await worker.cancel()
 
     announcer_task = asyncio.create_task(announcer.run(), name=f"announcer-{kitchen.id}")
-    await kitchen.attach(announcer.announce)
     runner = WorkerRunner(handle_sigint=False)
     try:
         await runner.add_workers(worker)
