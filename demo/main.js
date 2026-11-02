@@ -394,13 +394,16 @@ function row(label, value) {
 
 function renderReport() {
   const m = c.analytics.sessionMetrics();
+  // Typed answers have no speech timing, so their timing metrics would be meaningless zeros.
+  const spoken = m.answers.some((a) => a.durationS > 0);
+  const timedOnly = (value) => (spoken ? value : "n/a (typed answers have no speech timing)");
   const out = [el("h3", "Report")];
   const summary = el("table");
   summary.append(
-    row("Average pace", m.avgWpm ? `${m.avgWpm} words per minute` : "n/a (typed answers have no timing)"),
-    row("Fillers per minute", String(m.fillersPerMin)),
-    row("Share of the time you spoke", `${Math.round(m.talkRatio * 100)}%`),
-    row("Average thinking time", m.avgThinkingTimeS == null ? "n/a" : `${m.avgThinkingTimeS} s`),
+    row("Average pace", timedOnly(`${m.avgWpm} words per minute`)),
+    row("Fillers per minute", timedOnly(String(m.fillersPerMin))),
+    row("Share of the time you spoke", timedOnly(`${Math.round(m.talkRatio * 100)}%`)),
+    row("Average thinking time", m.avgThinkingTimeS == null ? "n/a" : timedOnly(`${m.avgThinkingTimeS} s`)),
   );
   out.push(summary);
   m.answers.forEach((a, i) => {
@@ -409,14 +412,15 @@ function renderReport() {
     out.push(el("p", a.wordCount ? `You said: "${a.transcript}"` : "No answer given."));
     if (a.wordCount) {
       const t = el("table");
+      const timed = a.durationS > 0;
       const tics = Object.entries(a.verbalTics).map(([w, n]) => `"${w}" ×${n}`).join(", ") || "none";
       t.append(
-        row("Words", `${a.wordCount} in ${a.durationS} s`),
-        row("Pace", a.wpm ? `${a.wpm} wpm (${a.paceBand})` : "n/a"),
-        row("Fillers (um, uh)", `${a.fillerCount} (${a.fillersPerMin} per minute)`),
+        row("Words", timed ? `${a.wordCount} in ${a.durationS} s` : String(a.wordCount)),
+        row("Pace", timed ? `${a.wpm} wpm (${a.paceBand})` : "n/a"),
+        row("Fillers (um, uh)", timed ? `${a.fillerCount} (${a.fillersPerMin} per minute)` : String(a.fillerCount)),
         row("Verbal tics", tics),
-        row("Longest pause", `${a.longestPauseS} s`),
-        row("Thinking time before answering", a.thinkingTimeS == null ? "n/a" : `${a.thinkingTimeS} s`),
+        row("Longest pause", timed ? `${a.longestPauseS} s` : "n/a"),
+        row("Thinking time before answering", timed && a.thinkingTimeS != null ? `${a.thinkingTimeS} s` : "n/a"),
       );
       out.push(t);
     }
