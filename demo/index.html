@@ -3,137 +3,35 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Voice AI Agents: Live Demo</title>
+  <title>Voice AI agents: live demos</title>
+  <meta name="description" content="Two voice agents running in your browser: Kitchen Companion and Interview Coach.">
   <style>
     :root { color-scheme: light; }
-    body { max-width: 760px; margin: 0 auto; padding: 24px 16px 64px; background: #fff; color: #000;
-      font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-    h1 { font-size: 1.6rem; margin: 0 0 8px; }
-    h2 { font-size: 1.25rem; margin: 24px 0 8px; }
-    h3 { font-size: 1.05rem; margin: 20px 0 6px; }
-    h4 { font-size: 1rem; margin: 18px 0 4px; }
-    a { color: #000; }
-    button, select, input { font: inherit; color: #000; background: #fff; border: 1px solid #000;
-      border-radius: 0; padding: 6px 10px; }
-    button { cursor: pointer; }
-    button[aria-pressed="true"] { background: #000; color: #fff; }
-    button:disabled { opacity: 0.4; cursor: default; }
-    .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 8px 0; }
-    .row input { flex: 1 1 220px; min-width: 0; }
-    table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
-    th, td { text-align: left; vertical-align: top; padding: 6px 6px 6px 0; border-bottom: 1px solid #000; }
-    td { overflow-wrap: anywhere; }
-    #notice:empty { display: none; }
-    #notice { border: 1px solid #000; padding: 8px; }
-    .small { font-size: 0.9rem; }
+    *, *::before, *::after { box-sizing: border-box; }
+    body { max-width: 860px; margin: 0 auto; padding: 32px 20px 64px; background: #fff; color: #000;
+      font: 1rem/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+    h1 { margin: 0 0 8px; font-size: clamp(1.6rem, 1.2rem + 1.6vw, 2.2rem); line-height: 1.15; }
+    p { margin: 0 0 24px; max-width: 60ch; }
+    ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); }
+    a.site { display: block; height: 100%; padding: 24px; border-radius: 10px; color: #fff; text-decoration: none; }
+    a.site:hover strong, a.site:focus-visible strong { text-decoration: underline; text-underline-offset: 0.2em; }
+    a.site:focus-visible { outline: 3px solid #000; outline-offset: 3px; }
+    .kitchen { background: #1f3c88; }
+    .coach { background: #0e3b2e; }
+    strong { display: block; margin-bottom: 6px; font-size: 1.25rem; }
+    span { display: block; }
+    .source { margin-top: 28px; }
+    .source a { color: #000; text-underline-offset: 0.2em; }
   </style>
 </head>
 <body>
-  <h1>Voice AI Agents: Live Demo</h1>
-  <p>Both agents run entirely in your browser: the browser handles speech recognition and speech, and the
-    agent logic is the repository's own Python code ported to JavaScript. No account or API key is needed;
-    the few turns that need Claude in the full app are labelled as such.</p>
-  <p id="notice" role="status"></p>
-
-  <div class="row">
-    <button id="tab-kitchen" aria-pressed="true">Kitchen Companion</button>
-    <button id="tab-coach" aria-pressed="false">Interview Coach</button>
-    <label><input type="checkbox" id="speak" checked> Speak replies aloud</label>
-  </div>
-
-  <section id="kitchen">
-    <h2>Kitchen Companion</h2>
-    <p>Load a recipe, press Start listening, and talk to Chef. Begin with "Chef", as in "Chef, next step";
-      for eight seconds after Chef speaks you can reply without it, and anything else is ignored as
-      overheard conversation.</p>
-    <div class="row">
-      <label for="k-recipe">Recipe</label>
-      <select id="k-recipe"></select>
-      <button id="k-load" disabled>Load recipe</button>
-    </div>
-    <div class="row">
-      <button id="k-listen" aria-pressed="false">Start listening</button>
-      <button id="k-hey">Hey Chef (tap, then speak)</button>
-    </div>
-    <p id="k-status" class="small" aria-live="polite"></p>
-    <form id="k-form" class="row">
-      <input id="k-text" aria-label="Type to Chef" placeholder='Or type, for example "Chef, next step"'>
-      <button>Send</button>
-    </form>
-
-    <h3>Current step</h3>
-    <p id="k-step">No recipe loaded.</p>
-    <h3>Timers</h3>
-    <ul id="k-timers"><li>None running.</li></ul>
-    <details>
-      <summary>Ingredients <span id="k-servings"></span></summary>
-      <ul id="k-ingredients"></ul>
-    </details>
-    <details>
-      <summary>Things to say</summary>
-      <ul>
-        <li>"Chef, next step", "go back", "repeat that", "go to step four"</li>
-        <li>"Yes" when Chef offers a timer, or "Chef, set a rice timer for 1 minute"</li>
-        <li>"Chef, how long is left?", "cancel the rice timer", "got it" when one rings</li>
-        <li>"Chef, how much flour?", "Chef, make it for 8 people"</li>
-        <li>"Stop" while Chef is talking; say something without "Chef" to see it ignored</li>
-      </ul>
-    </details>
-
-    <h3>Conversation</h3>
-    <p class="small">Newest first. Reply time runs from your words being transcribed to Chef starting to speak.</p>
-    <table>
-      <thead><tr><th>You</th><th>How it was handled</th><th>Chef</th><th>Reply time</th></tr></thead>
-      <tbody id="k-log"></tbody>
-    </table>
-  </section>
-
-  <section id="coach" hidden>
-    <h2>Interview Coach</h2>
-    <p>Answer each question out loud. The interviewer waits through thinking pauses and moves on after about
-      three seconds of silence, or six if you trail off on "and" or "um"; you can also press Done answering.</p>
-    <div class="row">
-      <label>Role
-        <select id="c-family">
-          <option value="general">General</option>
-          <option value="software">Software engineering</option>
-          <option value="data">Data</option>
-          <option value="ai_ml">AI and machine learning</option>
-          <option value="product">Product management</option>
-          <option value="design">Design</option>
-        </select>
-      </label>
-      <label>Level <select id="c-level"></select></label>
-      <label>Style
-        <select id="c-style">
-          <option value="behavioral">Behavioral</option>
-          <option value="technical">Technical</option>
-          <option value="mixed">Mixed</option>
-        </select>
-      </label>
-      <label>Questions
-        <select id="c-count"><option>2</option><option selected>3</option><option>5</option></select>
-      </label>
-    </div>
-    <div class="row">
-      <button id="c-start" disabled>Start interview</button>
-      <button id="c-done">Done answering</button>
-      <button id="c-repeat">Repeat question</button>
-      <button id="c-end">End interview</button>
-    </div>
-    <p id="c-status" class="small" aria-live="polite"></p>
-    <form id="c-form" class="row">
-      <input id="c-text" aria-label="Type an answer" placeholder="Or type an answer">
-      <button>Send</button>
-    </form>
-    <h3>Question</h3>
-    <p id="c-question"></p>
-    <h3>Your answer</h3>
-    <p id="c-answer"></p>
-    <div id="c-report"></div>
-  </section>
-
-  <p class="small"><a href="https://github.com/rhain-r/voice-ai-agent">Source code on GitHub</a></p>
-  <script type="module" src="main.js"></script>
+  <h1>Voice AI agents: live demos</h1>
+  <p>Two voice agents that run in your browser with no account or API key. Chrome, Edge and Safari can listen; any browser can type.</p>
+  <ul>
+    <li><a class="site kitchen" href="kitchen/"><strong>Kitchen Companion</strong><span>Cook hands-free: say “Chef, next step”, set timers and ask how much flour goes in.</span></a></li>
+    <li><a class="site coach" href="coach/"><strong>Interview Coach</strong><span>Practice an interview out loud and get a report on your pace, filler words and pauses.</span></a></li>
+  </ul>
+  <p class="source"><a href="https://github.com/rhain-r/voice-ai-agent">Source code on GitHub</a></p>
 </body>
 </html>

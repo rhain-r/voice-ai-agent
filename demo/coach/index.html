@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Interview Coach: live demo</title>
+  <meta name="description" content="Practice a job interview out loud. The interviewer asks each question, waits through your thinking pauses, and reports your pace, filler words, pauses and thinking time.">
+  <meta name="theme-color" content="#0e3b2e">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to the interview</a>
+
+  <header class="band">
+    <div class="band-inner">
+      <p class="brand" translate="no">Interview Coach</p>
+      <nav aria-label="Other pages">
+        <a href="../kitchen/">Kitchen Companion demo</a>
+        <a href="https://github.com/rhain-r/voice-ai-agent/tree/main/interview-coach">Source code</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="page" tabindex="-1">
+    <ol class="stages" aria-label="Interview stages">
+      <li id="stage-setup" aria-current="step">Set up</li>
+      <li id="stage-room">Interview</li>
+      <li id="stage-report">Report</li>
+    </ol>
+
+    <!-- 1. Set up -->
+    <section id="setup" class="setup" aria-labelledby="setup-heading">
+      <div class="letter">
+        <h1 id="setup-heading">Practice an interview out loud</h1>
+        <p class="lede">Choose the role and format. The interviewer reads each question aloud, waits through your
+          thinking pauses, and then reports how you spoke.</p>
+
+        <form id="setup-form" class="fields" autocomplete="off">
+          <div class="field">
+            <label for="family">Role</label>
+            <select id="family" name="family">
+              <option value="general">General</option>
+              <option value="software">Software engineering</option>
+              <option value="data">Data and analytics</option>
+              <option value="ai_ml">AI and machine learning</option>
+              <option value="product" selected>Product management</option>
+              <option value="design">Design</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="level">Level</label>
+            <select id="level" name="level"></select>
+          </div>
+          <fieldset class="field">
+            <legend>Format</legend>
+            <div class="segments">
+              <label><input type="radio" name="style" value="behavioral" checked><span>Behavioral</span></label>
+              <label><input type="radio" name="style" value="technical"><span>Technical</span></label>
+              <label><input type="radio" name="style" value="mixed"><span>Mixed</span></label>
+            </div>
+          </fieldset>
+          <fieldset class="field">
+            <legend>Number of questions</legend>
+            <div class="segments">
+              <label><input type="radio" name="count" value="2"><span>2</span></label>
+              <label><input type="radio" name="count" value="3" checked><span>3</span></label>
+              <label><input type="radio" name="count" value="5"><span>5</span></label>
+            </div>
+          </fieldset>
+          <label class="check"><input type="checkbox" id="speak" checked> The interviewer speaks aloud</label>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" id="start" disabled>Loading questions…</button>
+          </div>
+          <div class="alert" id="setup-error" role="alert" hidden>
+            <p>The question bank didn't load. Check your connection, then reload the page.</p>
+            <button type="button" class="btn btn-quiet" id="reload">Reload</button>
+          </div>
+        </form>
+      </div>
+
+      <aside class="brief" aria-labelledby="brief-heading">
+        <h2 id="brief-heading">What the report measures</h2>
+        <dl class="measures">
+          <dt>Pace</dt>
+          <dd>Words per minute for each answer, against a conversational range of 110 to 170.</dd>
+          <dt>Filler words</dt>
+          <dd>“Um”, “uh” and “er” per minute, plus habits such as “you know”, “like” and “basically”.</dd>
+          <dt>Pauses</dt>
+          <dd>Your longest silence inside an answer, and how many ran past three seconds.</dd>
+          <dt>Thinking time</dt>
+          <dd>How long you took to start answering after the question ended.</dd>
+        </dl>
+        <p class="aside-note" id="mic-note">Answering out loud needs Chrome, Edge or Safari. You can type answers in any
+          browser; the report then leaves out the timing measures.</p>
+        <p class="aside-note">In the full app, Claude Opus 5.5 also scores each answer on structure, specificity, impact,
+          relevance and communication, and writes a coaching plan. This demo runs only the measurements.</p>
+      </aside>
+    </section>
+
+    <!-- 2. Interview -->
+    <section id="room" class="room" aria-labelledby="question-text" hidden>
+      <div class="question">
+        <p class="question-meta" id="question-meta"></p>
+        <h1 class="question-text" id="question-text" tabindex="-1"></h1>
+        <p class="room-status" id="room-status" aria-live="polite"></p>
+      </div>
+
+      <div class="answer">
+        <h2>Your answer</h2>
+        <p class="answer-text" id="answer-text"></p>
+        <div class="patience" id="patience">
+          <div class="meter" aria-hidden="true"><span class="meter-fill" id="patience-fill"></span></div>
+          <p class="patience-text" id="patience-text" aria-live="off"></p>
+        </div>
+        <div class="room-actions">
+          <button type="button" class="btn btn-primary" id="done">I'm done answering</button>
+          <button type="button" class="btn btn-quiet" id="repeat">Repeat the question</button>
+          <button type="button" class="btn btn-quiet" id="end">End interview</button>
+        </div>
+        <form id="answer-form" class="typed" autocomplete="off">
+          <label for="typed">Or type your answer</label>
+          <textarea id="typed" name="typed" rows="3" placeholder="Type your answer…"></textarea>
+          <button type="submit" class="btn btn-quiet">Submit answer</button>
+        </form>
+        <p class="notice" id="notice" role="status"></p>
+      </div>
+    </section>
+
+    <!-- 3. Report -->
+    <section id="report" class="report" aria-labelledby="report-heading" hidden>
+      <div class="report-head">
+        <h1 id="report-heading" tabindex="-1">Interview report</h1>
+        <p class="report-meta" id="report-meta"></p>
+      </div>
+      <dl class="summary" id="summary"></dl>
+      <div id="answers"></div>
+      <p class="report-note">In the full app, Claude Opus 5.5 also scores each answer from 1 to 5 on structure,
+        specificity, impact, relevance and communication, quotes your own words as evidence, and writes a
+        three-point coaching plan.</p>
+      <div class="report-actions">
+        <button type="button" class="btn btn-primary" id="again">Practice another interview</button>
+        <button type="button" class="btn btn-quiet" id="print">Print or save as PDF</button>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

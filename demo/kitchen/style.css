@@ -1,0 +1,281 @@
+/* Enamel cookware: a cobalt shell, white enamel panels with a dark rim, cast-iron black type.
+   Yolk is the one accent and only marks "Chef is listening to you right now". */
+:root {
+  --enamel: #1f3c88;
+  --enamel-deep: #142b66;
+  --enamel-rim: #0c1d4a;
+  --enamel-wash: #eef2fa;
+  --white: #fff;
+  --ink: #000;
+  --ink-soft: #3d4658;
+  --on-enamel-soft: #d3ddf5;
+  --yolk: #f6b800;
+  --line: #d6dcea;
+  --font: "Atkinson Hyperlegible Next", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scrollbar-color: #8fa3d6 var(--enamel-deep);
+}
+
+body {
+  margin: 0;
+  background: var(--enamel);
+  color: var(--white);
+  font: 1.0625rem/1.5 var(--font);
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection { background: var(--yolk); color: var(--ink); }
+
+a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 2px; }
+button, input { font: inherit; }
+button { cursor: pointer; touch-action: manipulation; }
+button:disabled { cursor: not-allowed; opacity: 0.45; }
+
+:focus-visible { outline: 3px solid var(--yolk); outline-offset: 3px; }
+.pot :focus-visible, .card :focus-visible { outline-color: var(--enamel); }
+
+.skip {
+  position: absolute; left: 12px; top: -80px; z-index: 10;
+  padding: 10px 14px; border-radius: 10px;
+  background: var(--yolk); color: var(--ink); font-weight: 800; text-decoration: none;
+}
+.skip:focus { top: 12px; }
+
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* -- shell ------------------------------------------------------------------------------------ */
+
+.bar, .layout {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left));
+  padding-right: max(16px, env(safe-area-inset-right));
+}
+
+.bar {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: 4px 20px; padding-top: 12px; padding-bottom: 12px;
+}
+.brand { margin: 0; font-size: 1.3rem; font-weight: 800; }
+.bar nav { display: flex; flex-wrap: wrap; gap: 0 20px; }
+.bar nav a { display: inline-flex; align-items: center; min-height: 44px; font-weight: 600; }
+.bar nav a:hover { text-decoration-color: var(--yolk); }
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "pot" "dock" "side" "log" "try";
+  gap: 20px;
+  padding-bottom: max(48px, env(safe-area-inset-bottom));
+}
+.pot { grid-area: pot; }
+.dock { grid-area: dock; }
+.side { grid-area: side; }
+.log { grid-area: log; }
+.try { grid-area: try; }
+
+/* -- the pot: the white enamel panel that holds the current step ------------------------------- */
+
+.pot {
+  background: var(--white);
+  color: var(--ink);
+  border: 6px solid var(--enamel-rim);
+  border-radius: 28px;
+  padding: clamp(18px, 3vw, 40px);
+  min-height: 300px;
+}
+.pot:focus { outline: none; }
+.pot:focus-visible { outline: 3px solid var(--yolk); outline-offset: 3px; }
+
+.pot-state h1 {
+  margin: 0 0 8px;
+  font-size: clamp(1.6rem, 1.15rem + 2vw, 2.5rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+.pot-lede { margin: 0 0 20px; max-width: 52ch; color: var(--ink-soft); }
+
+.recipes {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr));
+}
+.recipe {
+  display: grid; gap: 4px; width: 100%; min-height: 92px; padding: 16px 18px;
+  text-align: left; color: var(--ink); background: var(--white);
+  border: 2px solid var(--line); border-radius: 16px;
+  transition: border-color 120ms ease-out, background-color 120ms ease-out;
+}
+.recipe:hover { border-color: var(--enamel); background: var(--enamel-wash); }
+.recipe-name { font-size: 1.2rem; font-weight: 800; line-height: 1.2; }
+.recipe-meta { color: var(--ink-soft); font-size: 0.95rem; }
+
+.step-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; }
+.pot-state .recipe-title { margin: 0; font-size: 1.25rem; line-height: 1.25; }
+.step-count {
+  margin: 28px 0 6px;
+  color: var(--ink-soft);
+  font-weight: 600; font-variant-numeric: tabular-nums;
+}
+.step-text {
+  margin: 0 0 28px;
+  max-width: 24ch;
+  min-height: 3.5em;
+  font-size: clamp(1.75rem, 0.95rem + 3.3vw, 3.4rem);
+  font-weight: 600;
+  line-height: 1.16;
+  letter-spacing: -0.012em;
+  text-wrap: pretty;
+}
+
+.rail { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.rail button {
+  width: 48px; height: 48px; border-radius: 50%;
+  border: 2px solid var(--line); background: var(--white); color: var(--ink);
+  font-weight: 800; font-size: 1.05rem; font-variant-numeric: tabular-nums;
+  transition: background-color 120ms ease-out, border-color 120ms ease-out;
+}
+.rail button:hover { border-color: var(--enamel); }
+.rail .done button { background: var(--enamel-wash); border-color: var(--enamel-wash); color: var(--enamel); }
+.rail button[aria-current="step"] { background: var(--ink); border-color: var(--ink); color: var(--white); }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 48px; padding: 0 18px; border-radius: 12px;
+  border: 2px solid transparent; font-weight: 600; white-space: nowrap;
+  transition: background-color 120ms ease-out, border-color 120ms ease-out;
+}
+.btn-ink { background: var(--ink); color: var(--white); }
+.btn-quiet { background: var(--white); color: var(--ink); border-color: var(--line); min-height: 44px; }
+.btn-quiet:hover { border-color: var(--enamel); }
+.btn-light { background: transparent; color: var(--white); border-color: rgb(255 255 255 / 0.65); }
+.btn-light:hover { background: rgb(255 255 255 / 0.12); border-color: var(--white); }
+
+/* -- the dock: microphone, wake button and the follow-up window ------------------------------- */
+
+.dock {
+  display: grid; gap: 14px;
+  padding: 16px;
+  background: var(--enamel-deep);
+  border-radius: 22px;
+}
+.dock-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+
+.mic {
+  display: inline-flex; align-items: center; gap: 10px;
+  min-height: 64px; padding: 0 24px 0 18px;
+  border: 0; border-radius: 999px;
+  background: var(--white); color: var(--ink);
+  font-size: 1.1rem; font-weight: 800;
+  transition: background-color 160ms ease-out;
+}
+.mic[aria-pressed="true"] { background: var(--yolk); }
+
+.attention { flex: 1 1 240px; min-width: 0; }
+.attention-text { margin: 0 0 8px; font-weight: 600; overflow-wrap: anywhere; }
+.window { height: 8px; border-radius: 4px; background: rgb(255 255 255 / 0.16); overflow: hidden; }
+.window-fill {
+  display: block; height: 100%; width: 100%;
+  background: var(--yolk);
+  transform: scaleX(0); transform-origin: left center;
+  transition: transform 250ms linear;
+}
+
+.say { display: flex; gap: 10px; }
+.say input {
+  flex: 1 1 auto; min-width: 0; min-height: 48px; padding: 0 14px;
+  border: 2px solid transparent; border-radius: 12px;
+  background: var(--white); color: var(--ink);
+}
+.say input::placeholder { color: #5a6378; }
+
+.dock-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 20px; }
+.toggle { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; cursor: pointer; }
+.toggle input { width: 20px; height: 20px; margin: 0; accent-color: var(--yolk); }
+.notice { margin: 0; font-weight: 600; }
+.notice:empty { display: none; }
+
+/* -- side cards: timers and ingredients ------------------------------------------------------- */
+
+.side { display: grid; gap: 20px; align-content: start; }
+.card {
+  background: var(--white); color: var(--ink);
+  border: 4px solid var(--enamel-rim); border-radius: 18px;
+  padding: 18px 20px 20px;
+}
+.card h2 { margin: 0 0 12px; font-size: 1.15rem; font-weight: 800; }
+.servings { font-weight: 400; color: var(--ink-soft); }
+.empty { margin: 0; color: var(--ink-soft); }
+
+.timer-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.timer {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 2px 12px;
+  padding: 12px 12px 12px 16px; border-radius: 12px; background: var(--enamel-wash);
+}
+.timer-name { font-weight: 600; overflow-wrap: anywhere; }
+.timer-clock { grid-column: 1; font-size: 1.9rem; font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.timer .btn { grid-column: 2; grid-row: 1 / span 2; min-height: 44px; }
+.timer.due { background: var(--yolk); }
+.timer.due .timer-clock { font-size: 1.15rem; line-height: 1.3; }
+
+.ingredient-list { margin: 0; padding-left: 1.15em; display: grid; gap: 6px; }
+.ingredient-list li::marker { color: var(--enamel); }
+.ingredient-list.is-empty { padding-left: 0; list-style: none; }
+
+/* -- on the enamel: the conversation log and phrases ------------------------------------------ */
+
+.log h2, .try h2 { margin: 8px 0 4px; font-size: 1.35rem; font-weight: 800; }
+.log-lede { margin: 0 0 14px; max-width: 64ch; color: var(--on-enamel-soft); font-size: 0.95rem; }
+
+.turns { list-style: none; margin: 0; padding: 0; }
+.turn { display: grid; gap: 4px; padding: 12px 0; border-top: 1px solid rgb(255 255 255 / 0.25); }
+.turn p { margin: 0; overflow-wrap: anywhere; }
+.who { font-weight: 800; margin-right: 6px; }
+.route-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-size: 0.9rem; }
+.route { padding: 1px 8px; border: 1.5px solid rgb(255 255 255 / 0.7); border-radius: 6px; }
+.ms { color: var(--on-enamel-soft); font-variant-numeric: tabular-nums; }
+.turn.ignored .you, .turn.ignored .route { color: var(--on-enamel-soft); }
+.turn.ignored .route { border-style: dashed; }
+.turns .empty-turn { padding: 12px 0; border-top: 1px solid rgb(255 255 255 / 0.25); color: var(--on-enamel-soft); }
+
+.phrases { margin: 0; }
+.phrases dt { margin-top: 12px; font-weight: 800; }
+.phrases dd { margin: 2px 0 0; color: var(--on-enamel-soft); }
+.fine { margin: 20px 0 0; max-width: 64ch; color: var(--on-enamel-soft); font-size: 0.9rem; }
+
+/* -- reflow ----------------------------------------------------------------------------------- */
+
+@media (min-width: 700px) and (max-width: 1039px) {
+  .side { grid-template-columns: 1fr 1fr; align-items: start; }
+}
+
+@media (min-width: 1040px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr) 340px;
+    grid-template-areas: "pot side" "dock side" "log try";
+    align-items: start;
+  }
+  .pot { min-height: 420px; }
+}
+
+@media (max-width: 520px) {
+  .mic { flex: 1 1 auto; justify-content: center; }
+  .attention { flex-basis: 100%; }
+  .rail button { width: 44px; height: 44px; }
+  .step-count { margin-top: 20px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

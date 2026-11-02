@@ -6,10 +6,12 @@ Two real-time voice agents built with Claude, each designed around how people ac
 
 ## Try it out!
 
-| [Live &rarr;](https://rhain-r.github.io/voice-ai-agent/demo/) | Both agents in your browser, no account or API key |
+| Live demo | What you can do |
 | --- | --- |
+| [Kitchen Companion &rarr;](https://rhain-r.github.io/voice-ai-agent/demo/kitchen/) | Cook hands-free: say "Chef, next step", set timers, ask how much flour goes in |
+| [Interview Coach &rarr;](https://rhain-r.github.io/voice-ai-agent/demo/coach/) | Answer interview questions out loud and get a report on pace, filler words and pauses |
 
-The live demo runs each project's deterministic code, ported to JavaScript, with the browser's own speech recognition and voice. Use Chrome, Edge or Safari to speak (Firefox can type), and note that turns which need Claude in the full app are labelled rather than answered.
+Each demo runs its project's deterministic code, ported to JavaScript, with the browser's own speech recognition and voice, so no account or API key is needed. Use Chrome, Edge or Safari to speak (Firefox can type), and note that turns which need Claude in the full app are labelled rather than answered.
 
 ---
 
@@ -115,7 +117,10 @@ Continuous integration runs lint, tests and web builds on every change, and runs
 
 ```text
 .github/workflows/      CI for each project
-demo/                   Live browser demo (GitHub Pages)
+demo/
+    kitchen/            Kitchen Companion live demo (GitHub Pages)
+    coach/              Interview Coach live demo (GitHub Pages)
+    shared/             Browser speech input and output used by both
 interview-coach/
     src/interview_coach/
         agent/          Interviewer, prompts, analytics, telemetry, LLM fallback

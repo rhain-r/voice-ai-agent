@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Kitchen Companion: live demo</title>
+  <meta name="description" content="A hands-free cooking assistant you talk to. Pick a recipe, say “Chef, next step”, set timers and ask how much of something you need.">
+  <meta name="theme-color" content="#1f3c88">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;600;800&display=swap">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a class="skip" href="#pot">Skip to the recipe</a>
+
+  <header class="bar">
+    <p class="brand" translate="no">Kitchen Companion</p>
+    <nav aria-label="Other pages">
+      <a href="../coach/">Interview Coach demo</a>
+      <a href="https://github.com/rhain-r/voice-ai-agent/tree/main/kitchen-companion">Source code</a>
+    </nav>
+  </header>
+
+  <main class="layout">
+    <section class="pot" id="pot" aria-label="Recipe" tabindex="-1">
+      <div id="pot-loading" class="pot-state">
+        <h1>Loading recipes…</h1>
+      </div>
+
+      <div id="pot-error" class="pot-state" hidden>
+        <h1>The recipes didn't load</h1>
+        <p class="pot-lede">Check your connection, then reload the page.</p>
+        <button type="button" class="btn btn-ink" id="reload">Reload</button>
+      </div>
+
+      <div id="pot-picker" class="pot-state" hidden>
+        <h1>What are we cooking?</h1>
+        <p class="pot-lede">Pick a recipe and Chef reads the first step aloud. Then keep your hands in the bowl and talk.</p>
+        <ul class="recipes" id="recipes"></ul>
+      </div>
+
+      <div id="pot-cooking" class="pot-state" hidden>
+        <div class="step-head">
+          <h1 id="recipe-title" class="recipe-title"></h1>
+          <button type="button" class="btn btn-quiet" id="change-recipe">Change recipe</button>
+        </div>
+        <p class="step-count" id="step-count"></p>
+        <p class="step-text" id="step-text" aria-live="polite"></p>
+        <nav aria-label="Recipe steps">
+          <ol class="rail" id="rail"></ol>
+        </nav>
+      </div>
+    </section>
+
+    <section class="dock" aria-label="Talk to Chef">
+      <div class="dock-row">
+        <button type="button" class="mic" id="mic" aria-pressed="false">
+          <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" fill="none" stroke="currentColor"
+            stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="8.5" y="2.75" width="7" height="12" rx="3.5"/>
+            <path d="M5 11.25a7 7 0 0 0 14 0"/>
+            <path d="M12 18.25v3"/>
+          </svg>
+          <span id="mic-label">Start listening</span>
+        </button>
+        <button type="button" class="btn btn-light" id="hey">Hey Chef</button>
+        <div class="attention">
+          <p class="attention-text" id="attention-text" aria-live="polite">Microphone off. Type below, or start listening.</p>
+          <div class="window" aria-hidden="true"><span class="window-fill" id="window-fill"></span></div>
+        </div>
+      </div>
+      <form class="say" id="say-form" autocomplete="off">
+        <label class="visually-hidden" for="say">Say something to Chef</label>
+        <input id="say" name="say" type="text" placeholder="Type “Chef, next step”…" enterkeyhint="send">
+        <button type="submit" class="btn btn-light">Send</button>
+      </form>
+      <div class="dock-foot">
+        <label class="toggle"><input type="checkbox" id="speak" checked> Read replies aloud</label>
+        <p class="notice" id="notice" role="status"></p>
+      </div>
+    </section>
+
+    <aside class="side" aria-label="Timers and ingredients">
+      <section class="card timers" aria-labelledby="timers-heading">
+        <h2 id="timers-heading">Timers</h2>
+        <ul class="timer-list" id="timers"></ul>
+      </section>
+      <section class="card ingredients" aria-labelledby="ingredients-heading">
+        <h2 id="ingredients-heading">Ingredients <span class="servings" id="servings"></span></h2>
+        <ul class="ingredient-list" id="ingredients"></ul>
+      </section>
+    </aside>
+
+    <section class="log" aria-labelledby="log-heading">
+      <h2 id="log-heading">What Chef heard</h2>
+      <p class="log-lede">Newest first, with how each line was handled. Reply time runs from your words being transcribed to Chef starting to speak.</p>
+      <ol class="turns" id="log"></ol>
+    </section>
+
+    <section class="try" aria-labelledby="try-heading">
+      <h2 id="try-heading">Things to say</h2>
+      <dl class="phrases">
+        <dt>Move through the recipe</dt>
+        <dd>“Chef, next step”, “go back”, “repeat that”, “go to step four”</dd>
+        <dt>Timers</dt>
+        <dd>“Yes” when Chef offers one, “Chef, set a rice timer for 1 minute”, “how long is left?”, “got it” when it rings</dd>
+        <dt>Amounts</dt>
+        <dd>“Chef, how much flour?”, “Chef, make it for 8 people”</dd>
+        <dt>Interrupt or ignore</dt>
+        <dd>Say “stop” while Chef talks. Say anything without “Chef” and it's ignored as conversation in the room.</dd>
+      </dl>
+      <p class="fine">Your browser does the listening and the voice. The full app uses Deepgram for speech and sends open questions, such as substitutions, to Claude Haiku 5.5; this demo labels those instead of answering them.</p>
+    </section>
+  </main>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

@@ -248,6 +248,7 @@ export function recipeFromBundle(data) {
     id: data.id,
     title: data.title,
     servings: data.servings ?? 4,
+    totalTimeMin: data.total_time_min ?? null,
     ingredients: data.ingredients.map(parseIngredient),
     steps: data.steps.map((s, i) => ({ index: i, text: s.text, timerMinutes: s.timer_minutes ?? null })),
   };
