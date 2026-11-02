@@ -283,7 +283,7 @@ function renderReport() {
   $("answers").replaceChildren(...asked.map((q, i) => {
     const a = m.answers[i] ?? { wordCount: 0 };
     const timed = a.durationS > 0;
-    const article = el("article", { className: "answer-report" },
+    const article = el("article", { className: "answer-report sheet" },
       el("h2", { textContent: `Question ${i + 1}, ${q.style}` }),
       el("p", { className: "ar-question", textContent: q.text }));
     if (a.wordCount) {

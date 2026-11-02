@@ -1,16 +1,21 @@
-/* Walnut and cast iron: a brown wood shell, white panels with a dark iron rim, black type.
-   Yolk is the one accent and only marks "Chef is listening to you right now". */
+/* Baking parchment on a chestnut board. The shell is chestnut; every working panel is a sheet of
+   parchment with a caramel crust baked around its rim. Headings and the step you're on are set in
+   Bitter, a sturdy slab that still reads from across the counter; everything else stays in Atkinson
+   Hyperlegible Next. Olive is the one accent and only marks "Chef needs you now": listening, the
+   follow-up window, and a timer that has rung. */
 :root {
-  --wood: #5a3825;
-  --wood-deep: #3f2617;
-  --iron: #2a180e;
-  --wash: #f5ede6;
-  --white: #fff;
-  --ink: #000;
-  --ink-soft: #4e4038;
-  --on-wood-soft: #eadbcf;
-  --yolk: #f6b800;
-  --line: #e2d6cc;
+  --chestnut: #622b14;
+  --chestnut-deep: #4a1e0c;
+  --crust: #995f2f;
+  --olive: #978f66;
+  --parchment: #e4d6a9;
+  --wash: #d6c494;          /* a finished step or a running timer, one shade under the parchment */
+  --line: #c4ad79;
+  --ink: #2b130a;           /* 12.2:1 on parchment */
+  --ink-soft: #622b14;      /* chestnut on parchment, 7.7:1 */
+  --on-board: #e4d6a9;      /* 7.7:1 on chestnut */
+  --on-board-soft: #cdb98e; /* 5.8:1 on chestnut */
+  --slab: "Bitter", Georgia, "Times New Roman", serif;
   --font: "Atkinson Hyperlegible Next", system-ui, -apple-system, "Segoe UI", sans-serif;
   color-scheme: light;
 }
@@ -19,31 +24,31 @@
 
 html {
   -webkit-text-size-adjust: 100%;
-  scrollbar-color: #b89c88 var(--wood-deep);
+  scrollbar-color: var(--crust) var(--chestnut-deep);
 }
 
 body {
   margin: 0;
-  background: var(--wood);
-  color: var(--white);
+  background: var(--chestnut);
+  color: var(--on-board);
   font: 1.0625rem/1.5 var(--font);
   -webkit-tap-highlight-color: transparent;
 }
 
-::selection { background: var(--yolk); color: var(--ink); }
+::selection { background: var(--olive); color: var(--ink); }
 
 a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 2px; }
 button, input { font: inherit; }
 button { cursor: pointer; touch-action: manipulation; }
 button:disabled { cursor: not-allowed; opacity: 0.45; }
 
-:focus-visible { outline: 3px solid var(--yolk); outline-offset: 3px; }
-.pot :focus-visible, .card :focus-visible { outline-color: var(--wood); }
+:focus-visible { outline: 3px solid var(--parchment); outline-offset: 3px; }
+.pot :focus-visible, .card :focus-visible { outline-color: var(--chestnut); }
 
 .skip {
   position: absolute; left: 12px; top: -80px; z-index: 10;
   padding: 10px 14px; border-radius: 10px;
-  background: var(--yolk); color: var(--ink); font-weight: 800; text-decoration: none;
+  background: var(--parchment); color: var(--ink); font-weight: 800; text-decoration: none;
 }
 .skip:focus { top: 12px; }
 
@@ -65,10 +70,10 @@ button:disabled { cursor: not-allowed; opacity: 0.45; }
   display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
   gap: 4px 20px; padding-top: 12px; padding-bottom: 12px;
 }
-.brand { margin: 0; font-size: 1.3rem; font-weight: 800; }
+.brand { margin: 0; font-family: var(--slab); font-size: 1.35rem; font-weight: 800; }
 .bar nav { display: flex; flex-wrap: wrap; gap: 0 20px; }
 .bar nav a { display: inline-flex; align-items: center; min-height: 44px; font-weight: 600; }
-.bar nav a:hover { text-decoration-color: var(--yolk); }
+.bar nav a:hover { text-decoration-color: var(--crust); }
 
 .layout {
   display: grid;
@@ -83,22 +88,23 @@ button:disabled { cursor: not-allowed; opacity: 0.45; }
 .log { grid-area: log; }
 .try { grid-area: try; }
 
-/* -- the pot: the white panel that holds the current step -------------------------------------- */
+/* -- the pot: the parchment sheet that holds the current step ---------------------------------- */
 
 .pot {
-  background: var(--white);
+  background: var(--parchment);
   color: var(--ink);
-  border: 6px solid var(--iron);
-  border-radius: 28px;
+  border: 6px solid var(--crust);
+  border-radius: 20px;
   padding: clamp(18px, 3vw, 40px);
   min-height: 300px;
 }
 .pot:focus { outline: none; }
-.pot:focus-visible { outline: 3px solid var(--yolk); outline-offset: 3px; }
+.pot:focus-visible { outline: 3px solid var(--parchment); outline-offset: 3px; }
 
 .pot-state h1 {
   margin: 0 0 8px;
-  font-size: clamp(1.6rem, 1.15rem + 2vw, 2.5rem);
+  font-family: var(--slab);
+  font-size: clamp(1.7rem, 1.2rem + 2vw, 2.6rem);
   font-weight: 800;
   line-height: 1.1;
   letter-spacing: -0.01em;
@@ -113,16 +119,16 @@ button:disabled { cursor: not-allowed; opacity: 0.45; }
 }
 .recipe {
   display: grid; gap: 4px; width: 100%; min-height: 92px; padding: 16px 18px;
-  text-align: left; color: var(--ink); background: var(--white);
-  border: 2px solid var(--line); border-radius: 16px;
+  text-align: left; color: var(--ink); background: transparent;
+  border: 2px solid var(--line); border-radius: 12px;
   transition: border-color 120ms ease-out, background-color 120ms ease-out;
 }
-.recipe:hover { border-color: var(--wood); background: var(--wash); }
-.recipe-name { font-size: 1.2rem; font-weight: 800; line-height: 1.2; }
+.recipe:hover { border-color: var(--crust); background: var(--wash); }
+.recipe-name { font-family: var(--slab); font-size: 1.2rem; font-weight: 700; line-height: 1.2; }
 .recipe-meta { color: var(--ink-soft); font-size: 0.95rem; }
 
 .step-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; }
-.pot-state .recipe-title { margin: 0; font-size: 1.25rem; line-height: 1.25; }
+.pot-state .recipe-title { margin: 0; font-size: 1.3rem; line-height: 1.25; }
 .step-count {
   margin: 28px 0 6px;
   color: var(--ink-soft);
@@ -132,6 +138,7 @@ button:disabled { cursor: not-allowed; opacity: 0.45; }
   margin: 0 0 28px;
   max-width: 24ch;
   min-height: 3.5em;
+  font-family: var(--slab);
   font-size: clamp(1.75rem, 0.95rem + 3.3vw, 3.4rem);
   font-weight: 600;
   line-height: 1.16;
@@ -142,52 +149,55 @@ button:disabled { cursor: not-allowed; opacity: 0.45; }
 .rail { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
 .rail button {
   width: 48px; height: 48px; border-radius: 50%;
-  border: 2px solid var(--line); background: var(--white); color: var(--ink);
+  border: 2px solid var(--line); background: transparent; color: var(--ink);
   font-weight: 800; font-size: 1.05rem; font-variant-numeric: tabular-nums;
   transition: background-color 120ms ease-out, border-color 120ms ease-out;
 }
-.rail button:hover { border-color: var(--wood); }
-.rail .done button { background: var(--wash); border-color: var(--wash); color: var(--wood); }
-.rail button[aria-current="step"] { background: var(--ink); border-color: var(--ink); color: var(--white); }
+.rail button:hover { border-color: var(--crust); }
+.rail .done button { background: var(--wash); border-color: var(--wash); color: var(--ink-soft); }
+.rail button[aria-current="step"] { background: var(--ink); border-color: var(--ink); color: var(--parchment); }
 
 .btn {
   display: inline-flex; align-items: center; justify-content: center;
-  min-height: 48px; padding: 0 18px; border-radius: 12px;
+  min-height: 48px; padding: 0 18px; border-radius: 10px;
   border: 2px solid transparent; font-weight: 600; white-space: nowrap;
   transition: background-color 120ms ease-out, border-color 120ms ease-out;
 }
-.btn-ink { background: var(--ink); color: var(--white); }
-.btn-quiet { background: var(--white); color: var(--ink); border-color: var(--line); min-height: 44px; }
-.btn-quiet:hover { border-color: var(--wood); }
-.btn-light { background: transparent; color: var(--white); border-color: rgb(255 255 255 / 0.65); }
-.btn-light:hover { background: rgb(255 255 255 / 0.12); border-color: var(--white); }
+.btn-ink { background: var(--ink); color: var(--parchment); }
+.btn-ink:hover { background: var(--chestnut); }
+.btn-quiet { background: transparent; color: var(--ink); border-color: var(--line); min-height: 44px; }
+.btn-quiet:hover { border-color: var(--crust); }
+.btn-light { background: transparent; color: var(--on-board); border-color: rgb(228 214 169 / 0.6); }
+.btn-light:hover { background: rgb(228 214 169 / 0.12); border-color: var(--parchment); }
 
 /* -- the dock: microphone, wake button and the follow-up window ------------------------------- */
 
 .dock {
   display: grid; gap: 14px;
   padding: 16px;
-  background: var(--wood-deep);
-  border-radius: 22px;
+  background: var(--chestnut-deep);
+  border-radius: 18px;
 }
 .dock-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
 
+/* The one pill on the page: the control you reach for with a floury knuckle. */
 .mic {
   display: inline-flex; align-items: center; gap: 10px;
   min-height: 64px; padding: 0 24px 0 18px;
   border: 0; border-radius: 999px;
-  background: var(--white); color: var(--ink);
+  background: var(--parchment); color: var(--ink);
   font-size: 1.1rem; font-weight: 800;
-  transition: background-color 160ms ease-out;
+  transition: background-color 160ms ease-out, box-shadow 160ms ease-out;
 }
-.mic[aria-pressed="true"] { background: var(--yolk); }
+/* Olive is quieter than parchment, so the live state also gets a ring to read as "on", not "off". */
+.mic[aria-pressed="true"] { background: var(--olive); box-shadow: 0 0 0 3px var(--chestnut-deep), 0 0 0 6px var(--olive); }
 
 .attention { flex: 1 1 240px; min-width: 0; }
 .attention-text { margin: 0 0 8px; font-weight: 600; overflow-wrap: anywhere; }
-.window { height: 8px; border-radius: 4px; background: rgb(255 255 255 / 0.16); overflow: hidden; }
+.window { height: 8px; border-radius: 4px; background: rgb(228 214 169 / 0.16); overflow: hidden; }
 .window-fill {
   display: block; height: 100%; width: 100%;
-  background: var(--yolk);
+  background: var(--olive);
   transform: scaleX(0); transform-origin: left center;
   transition: transform 250ms linear;
 }
@@ -195,14 +205,14 @@ button:disabled { cursor: not-allowed; opacity: 0.45; }
 .say { display: flex; gap: 10px; }
 .say input {
   flex: 1 1 auto; min-width: 0; min-height: 48px; padding: 0 14px;
-  border: 2px solid transparent; border-radius: 12px;
-  background: var(--white); color: var(--ink);
+  border: 2px solid transparent; border-radius: 10px;
+  background: var(--parchment); color: var(--ink);
 }
-.say input::placeholder { color: #6b5b50; }
+.say input::placeholder { color: var(--ink-soft); }
 
 .dock-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 20px; }
 .toggle { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; cursor: pointer; }
-.toggle input { width: 20px; height: 20px; margin: 0; accent-color: var(--yolk); }
+.toggle input { width: 20px; height: 20px; margin: 0; accent-color: var(--olive); }
 .notice { margin: 0; font-weight: 600; }
 .notice:empty { display: none; }
 
@@ -210,49 +220,50 @@ button:disabled { cursor: not-allowed; opacity: 0.45; }
 
 .side { display: grid; gap: 20px; align-content: start; }
 .card {
-  background: var(--white); color: var(--ink);
-  border: 4px solid var(--iron); border-radius: 18px;
+  background: var(--parchment); color: var(--ink);
+  border: 4px solid var(--crust); border-radius: 14px;
   padding: 18px 20px 20px;
 }
-.card h2 { margin: 0 0 12px; font-size: 1.15rem; font-weight: 800; }
-.servings { font-weight: 400; color: var(--ink-soft); }
+.card h2 { margin: 0 0 12px; font-family: var(--slab); font-size: 1.2rem; font-weight: 800; }
+.servings { font-family: var(--font); font-size: 1rem; font-weight: 400; color: var(--ink-soft); }
 .empty { margin: 0; color: var(--ink-soft); }
 
 .timer-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
 .timer {
   display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 2px 12px;
-  padding: 12px 12px 12px 16px; border-radius: 12px; background: var(--wash);
+  padding: 12px 12px 12px 16px; border-radius: 10px; background: var(--wash);
 }
 .timer-name { font-weight: 600; overflow-wrap: anywhere; }
 .timer-clock { grid-column: 1; font-size: 1.9rem; font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums; }
 .timer .btn { grid-column: 2; grid-row: 1 / span 2; min-height: 44px; }
-.timer.due { background: var(--yolk); }
+.timer.due { background: var(--olive); }
+.timer.due .btn-quiet { border-color: var(--ink); }
 .timer.due .timer-clock { font-size: 1.15rem; line-height: 1.3; }
 
 .ingredient-list { margin: 0; padding-left: 1.15em; display: grid; gap: 6px; }
-.ingredient-list li::marker { color: var(--wood); }
+.ingredient-list li::marker { color: var(--crust); }
 .ingredient-list.is-empty { padding-left: 0; list-style: none; }
 
-/* -- on the wood: the conversation log and phrases -------------------------------------------- */
+/* -- on the board: the conversation log and phrases ------------------------------------------- */
 
-.log h2, .try h2 { margin: 8px 0 4px; font-size: 1.35rem; font-weight: 800; }
-.log-lede { margin: 0 0 14px; max-width: 64ch; color: var(--on-wood-soft); font-size: 0.95rem; }
+.log h2, .try h2 { margin: 8px 0 4px; font-family: var(--slab); font-size: 1.4rem; font-weight: 800; }
+.log-lede { margin: 0 0 14px; max-width: 64ch; color: var(--on-board-soft); font-size: 0.95rem; }
 
 .turns { list-style: none; margin: 0; padding: 0; }
-.turn { display: grid; gap: 4px; padding: 12px 0; border-top: 1px solid rgb(255 255 255 / 0.25); }
+.turn { display: grid; gap: 4px; padding: 12px 0; border-top: 1px solid rgb(228 214 169 / 0.25); }
 .turn p { margin: 0; overflow-wrap: anywhere; }
 .who { font-weight: 800; margin-right: 6px; }
 .route-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-size: 0.9rem; }
-.route { padding: 1px 8px; border: 1.5px solid rgb(255 255 255 / 0.7); border-radius: 6px; }
-.ms { color: var(--on-wood-soft); font-variant-numeric: tabular-nums; }
-.turn.ignored .you, .turn.ignored .route { color: var(--on-wood-soft); }
+.route { padding: 1px 8px; border: 1.5px solid rgb(228 214 169 / 0.7); border-radius: 6px; }
+.ms { color: var(--on-board-soft); font-variant-numeric: tabular-nums; }
+.turn.ignored .you, .turn.ignored .route { color: var(--on-board-soft); }
 .turn.ignored .route { border-style: dashed; }
-.turns .empty-turn { padding: 12px 0; border-top: 1px solid rgb(255 255 255 / 0.25); color: var(--on-wood-soft); }
+.turns .empty-turn { padding: 12px 0; border-top: 1px solid rgb(228 214 169 / 0.25); color: var(--on-board-soft); }
 
 .phrases { margin: 0; }
 .phrases dt { margin-top: 12px; font-weight: 800; }
-.phrases dd { margin: 2px 0 0; color: var(--on-wood-soft); }
-.fine { margin: 20px 0 0; max-width: 64ch; color: var(--on-wood-soft); font-size: 0.9rem; }
+.phrases dd { margin: 2px 0 0; color: var(--on-board-soft); }
+.fine { margin: 20px 0 0; max-width: 64ch; color: var(--on-board-soft); font-size: 0.9rem; }
 
 /* -- reflow ----------------------------------------------------------------------------------- */
 

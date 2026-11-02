@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Interview Coach: live demo</title>
   <meta name="description" content="Practice a job interview out loud. The interviewer asks each question, waits through your thinking pauses, and reports your pace, filler words, pauses and thinking time.">
-  <meta name="theme-color" content="#0e3b2e">
+  <meta name="theme-color" content="#15370d">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,600&family=Public+Sans:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -33,7 +33,7 @@
 
     <!-- 1. Set up -->
     <section id="setup" class="setup" aria-labelledby="setup-heading">
-      <div class="letter">
+      <div class="letter sheet">
         <h1 id="setup-heading">Practice an interview out loud</h1>
         <p class="lede">Choose the role and format. The interviewer reads each question aloud, waits through your
           thinking pauses, and then reports how you spoke.</p>
@@ -102,13 +102,13 @@
 
     <!-- 2. Interview -->
     <section id="room" class="room" aria-labelledby="question-text" hidden>
-      <div class="question">
+      <div class="question sheet">
         <p class="question-meta" id="question-meta"></p>
         <h1 class="question-text" id="question-text" tabindex="-1"></h1>
         <p class="room-status" id="room-status" aria-live="polite"></p>
       </div>
 
-      <div class="answer">
+      <div class="answer on-desk">
         <h2>Your answer</h2>
         <p class="answer-text" id="answer-text"></p>
         <div class="patience" id="patience">
@@ -135,12 +135,12 @@
         <h1 id="report-heading" tabindex="-1">Interview report</h1>
         <p class="report-meta" id="report-meta"></p>
       </div>
-      <dl class="summary" id="summary"></dl>
+      <dl class="summary sheet" id="summary"></dl>
       <div id="answers"></div>
       <p class="report-note">In the full app, Claude Opus 5.5 also scores each answer from 1 to 5 on structure,
         specificity, impact, relevance and communication, quotes your own words as evidence, and writes a
         three-point coaching plan.</p>
-      <div class="report-actions">
+      <div class="report-actions on-desk">
         <button type="button" class="btn btn-primary" id="again">Practice another interview</button>
         <button type="button" class="btn btn-quiet" id="print">Print or save as PDF</button>
       </div>
