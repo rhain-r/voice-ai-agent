@@ -1,18 +1,17 @@
-/* Corporate letterhead in red-orange: an orange band with black type, white paper with an orange top rule.
-   Questions are set in a serif like a formal letter. Burnt orange carries the brand onto white wherever
-   the bright orange would be too light to read. */
+/* Corporate letterhead: a boardroom-green band, white paper with a green top rule, black type.
+   Questions are set in a serif like a formal letter; brass is the one accent and marks "you, now". */
 :root {
-  --brand: #e8590c;
-  --brand-hover: #d14d07;
-  --brand-ink: #a93d06;
-  --brand-wash: #fdeee5;
-  --brand-tint: #ffc9a3;
-  --page: #f4f2f0;
+  --green: #0e3b2e;
+  --green-hover: #175443;
+  --green-wash: #e8f0ec;
+  --green-tint: #a9c9ba;
+  --page: #f2f4f1;
   --paper: #fff;
   --ink: #000;
-  --ink-soft: #55493f;
-  --rule: #e0d8d1;
-  --control: #8a7b70;
+  --ink-soft: #46524c;
+  --rule: #cfd7d2;
+  --control: #7d8a83;
+  --brass: #b8892e;
   --error: #9f2a1f;
   --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
   --sans: "Libre Franklin", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -32,15 +31,15 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
-::selection { background: var(--brand-tint); color: var(--ink); }
+::selection { background: var(--green-tint); color: var(--ink); }
 
 a { color: inherit; text-underline-offset: 0.2em; }
 button, input, select, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; touch-action: manipulation; }
 button:disabled { cursor: not-allowed; opacity: 0.5; }
 
-:focus-visible { outline: 3px solid var(--brand-ink); outline-offset: 2px; }
-.band :focus-visible { outline-color: var(--ink); }
+:focus-visible { outline: 3px solid var(--green); outline-offset: 2px; }
+.band :focus-visible { outline-color: var(--paper); }
 
 .skip {
   position: absolute; left: 12px; top: -80px; z-index: 10;
@@ -51,7 +50,7 @@ button:disabled { cursor: not-allowed; opacity: 0.5; }
 
 /* -- band ------------------------------------------------------------------------------------- */
 
-.band { background: var(--brand); color: var(--ink); }
+.band { background: var(--green); color: var(--paper); }
 .band-inner, .page {
   max-width: 1080px;
   margin: 0 auto;
@@ -84,7 +83,7 @@ button:disabled { cursor: not-allowed; opacity: 0.5; }
   color: var(--ink-soft); font-weight: 500;
 }
 .stages li::before { content: counter(stage) ". "; font-variant-numeric: tabular-nums; }
-.stages li[aria-current="step"] { color: var(--ink); font-weight: 600; border-bottom-color: var(--brand); }
+.stages li[aria-current="step"] { color: var(--ink); font-weight: 600; border-bottom-color: var(--brass); }
 
 /* -- shared parts ----------------------------------------------------------------------------- */
 
@@ -100,10 +99,10 @@ h1 {
 .letter, .question, .answer-report {
   background: var(--paper);
   border: 1px solid var(--rule);
-  border-top: 6px solid var(--brand);
+  border-top: 6px solid var(--green);
   border-radius: 4px;
 }
-.letter, .question { box-shadow: 0 1px 2px rgb(90 40 10 / 0.06), 0 10px 28px -12px rgb(90 40 10 / 0.18); }
+.letter, .question { box-shadow: 0 1px 2px rgb(14 59 46 / 0.06), 0 10px 28px -12px rgb(14 59 46 / 0.18); }
 
 .btn {
   display: inline-flex; align-items: center; justify-content: center;
@@ -112,10 +111,10 @@ h1 {
   font-weight: 600; white-space: nowrap;
   transition: background-color 120ms ease-out, border-color 120ms ease-out;
 }
-.btn-primary { background: var(--brand); color: var(--ink); }
-.btn-primary:hover:not(:disabled) { background: var(--brand-hover); }
-.btn-quiet { background: var(--paper); color: var(--brand-ink); border-color: var(--control); }
-.btn-quiet:hover:not(:disabled) { background: var(--brand-wash); }
+.btn-primary { background: var(--green); color: var(--paper); }
+.btn-primary:hover:not(:disabled) { background: var(--green-hover); }
+.btn-quiet { background: var(--paper); color: var(--green); border-color: var(--control); }
+.btn-quiet:hover:not(:disabled) { background: var(--green-wash); }
 
 /* -- 1. set up -------------------------------------------------------------------------------- */
 
@@ -130,11 +129,11 @@ h1 {
 select {
   width: 100%; min-height: 48px; padding: 0 40px 0 12px;
   border: 1px solid var(--control); border-radius: 6px;
-  background: var(--paper) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5' fill='none' stroke='%23a93d06' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 14px center;
+  background: var(--paper) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5' fill='none' stroke='%230e3b2e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 14px center;
   color: var(--ink);
   appearance: none;
 }
-select:hover { border-color: var(--brand-ink); }
+select:hover { border-color: var(--green); }
 
 .segments {
   display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr);
@@ -150,12 +149,12 @@ select:hover { border-color: var(--brand-ink); }
   transition: background-color 120ms ease-out;
 }
 .segments label:first-child span { border-left: 0; }
-.segments label:hover span { background: var(--brand-wash); }
-.segments input:checked + span { background: var(--brand); color: var(--ink); font-weight: 600; }
-.segments input:focus-visible + span { box-shadow: inset 0 0 0 3px var(--ink); }
+.segments label:hover span { background: var(--green-wash); }
+.segments input:checked + span { background: var(--green); color: var(--paper); font-weight: 600; }
+.segments input:focus-visible + span { box-shadow: inset 0 0 0 3px var(--brass); }
 
 .check { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; cursor: pointer; }
-.check input { width: 20px; height: 20px; margin: 0; accent-color: var(--brand-ink); }
+.check input { width: 20px; height: 20px; margin: 0; accent-color: var(--green); }
 
 .alert {
   display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px;
@@ -184,7 +183,7 @@ select:hover { border-color: var(--brand-ink); }
 .question-text:focus { outline: none; }
 .room-status { display: flex; align-items: center; gap: 10px; margin: 0; font-weight: 600; }
 .room-status[data-live="true"]::before {
-  content: ""; flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--brand);
+  content: ""; flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--brass);
 }
 
 .answer h2 { margin: 0 0 8px; font-size: 1rem; font-weight: 700; }
@@ -199,7 +198,7 @@ select:hover { border-color: var(--brand-ink); }
 .meter { height: 6px; border-radius: 3px; background: var(--rule); overflow: hidden; }
 .meter-fill {
   display: block; width: 100%; height: 100%;
-  background: var(--brand-ink);
+  background: var(--green);
   transform: scaleX(0); transform-origin: left center;
   transition: transform 100ms linear;
 }
@@ -229,7 +228,7 @@ select:hover { border-color: var(--brand-ink); }
   display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
   gap: 1px; margin: 0; overflow: hidden;
   background: var(--rule);
-  border: 1px solid var(--rule); border-top: 6px solid var(--brand); border-radius: 4px;
+  border: 1px solid var(--rule); border-top: 6px solid var(--green); border-radius: 4px;
 }
 .summary > div { padding: 16px 20px 18px; background: var(--paper); }
 .summary dt { color: var(--ink-soft); font-weight: 600; font-size: 0.9rem; }
@@ -247,7 +246,7 @@ select:hover { border-color: var(--brand-ink); }
 .scale { position: relative; height: 34px; }
 .scale-track, .scale-band { position: absolute; top: 12px; height: 8px; border-radius: 4px; }
 .scale-track { left: 0; right: 0; background: var(--rule); }
-.scale-band { background: var(--brand-tint); }
+.scale-band { background: var(--green-tint); }
 .scale-mark { position: absolute; top: 4px; width: 4px; height: 24px; margin-left: -2px; border-radius: 2px; background: var(--ink); }
 .pace figcaption { color: var(--ink-soft); font-size: 0.95rem; }
 .pace figcaption strong { color: var(--ink); }
@@ -261,7 +260,7 @@ select:hover { border-color: var(--brand-ink); }
 .covers legend { padding: 0; margin-bottom: 4px; font-weight: 700; }
 .covers-hint { margin: 0 0 6px; color: var(--ink-soft); font-size: 0.92rem; }
 .covers label { display: flex; align-items: center; gap: 12px; min-height: 44px; cursor: pointer; }
-.covers input { flex: none; width: 20px; height: 20px; margin: 0; accent-color: var(--brand-ink); }
+.covers input { flex: none; width: 20px; height: 20px; margin: 0; accent-color: var(--green); }
 .covers-count { margin: 6px 0 0; font-weight: 600; font-variant-numeric: tabular-nums; }
 
 .report-note { margin: 0; max-width: 70ch; color: var(--ink-soft); font-size: 0.95rem; }

@@ -18,7 +18,8 @@ const el = (tag, props = {}, ...children) => {
   node.append(...children);
   return node;
 };
-const seconds = (s) => `${s.toFixed(1)} s`;
+const seconds = (s) => `${s.toFixed(1)} s`;
+const RANGE_TEXT = `${PACE_BAND[0]} to ${PACE_BAND[1]}`;
 
 const voice = createVoice({ onNotice: (text) => ($("notice").textContent = text), onState: renderStatus });
 
@@ -216,14 +217,15 @@ function paceFigure(a) {
   scale.setAttribute("aria-hidden", "true");
   return el("figure", { className: "pace" }, scale,
     el("figcaption", {}, el("strong", { textContent: `${Math.round(a.wpm)} words per minute, ${a.paceBand}.` }),
-      ` The shaded band is the conversational range, ${PACE_BAND[0]} to ${PACE_BAND[1]}.`));
+      ` The shaded band is the conversational range, ${RANGE_TEXT}.`));
 }
 
 function metricsTable(a, timed) {
   const tics = Object.entries(a.verbalTics).map(([w, n]) => `“${w}” ${n}×`).join(", ") || "None";
   const rows = [
     ["Words", timed ? `${a.wordCount} in ${seconds(a.durationS)}` : String(a.wordCount)],
-    ["Filler words (um, uh, er)", timed ? `${a.fillerCount}, or ${a.fillersPerMin} per minute` : String(a.fillerCount)],
+    ["Filler words (um, uh, er)", !a.fillerCount ? "None"
+      : timed ? `${a.fillerCount}, or ${a.fillersPerMin} per minute` : String(a.fillerCount)],
     ["Verbal habits", tics],
     ["Longest pause", timed ? seconds(a.longestPauseS) : "Not measured for typed answers"],
     ["Pauses over 3 seconds", timed ? String(a.pausesOver3s) : "Not measured for typed answers"],
@@ -242,7 +244,7 @@ function coversChecklist(q, i) {
       const ticked = boxes.filter((b) => b.querySelector("input").checked).length;
       count.textContent = `${ticked} of ${boxes.length} ticked`;
     });
-    return el("label", {}, box, point);
+    return el("label", {}, box, point[0].toUpperCase() + point.slice(1));
   });
   return el("fieldset", { className: "covers" }, el("legend", { textContent: "A strong answer covers" }),
     el("p", { className: "covers-hint", textContent: "Tick what your answer included." }), ...boxes, count);
@@ -261,7 +263,7 @@ function renderReport() {
   const share = !spoken ? [notTimed, "n/a"] : !c.voiced ? ["The interviewer's voice was off", "n/a"]
     : ["Your speech against the interviewer's", `${Math.round(m.talkRatio * 100)}%`];
   const items = [
-    ["Average pace", spoken ? `${Math.round(m.avgWpm)} wpm` : "n/a", spoken ? `Conversational is ${PACE_BAND[0]} to ${PACE_BAND[1]}` : notTimed],
+    ["Average pace", spoken ? `${Math.round(m.avgWpm)} wpm` : "n/a", spoken ? `Conversational is ${RANGE_TEXT}` : notTimed],
     ["Filler words", spoken ? `${m.fillersPerMin} / min` : "n/a", spoken ? "Um, uh and er per minute of speech" : notTimed],
     ["Your share of the talking", share[1], share[0]],
     ["Average thinking time", spoken && m.avgThinkingTimeS != null ? seconds(m.avgThinkingTimeS) : "n/a",
