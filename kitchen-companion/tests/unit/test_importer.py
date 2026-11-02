@@ -149,7 +149,7 @@ async def test_import_size_cap():
     def handler(request: httpx.Request) -> httpx.Response:
         return httpx.Response(200, content=big)
 
-    with pytest.raises(RecipeNotFound, match="page too large"):
+    with pytest.raises(RecipeNotFound, match="page is too large"):
         await import_recipe(
             "https://example.com/big", transport=httpx.MockTransport(handler), resolve=resolver(PUBLIC)
         )

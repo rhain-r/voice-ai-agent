@@ -240,9 +240,9 @@ async def _fetch(url: str, transport, resolve) -> tuple[str, str]:
                 async for chunk in resp.aiter_bytes():
                     body.extend(chunk)
                     if len(body) > MAX_BYTES:
-                        raise RecipeNotFound("Couldn't import that — page too large.")
+                        raise RecipeNotFound("Couldn't import that: the page is too large.")
                 return body.decode(resp.encoding or "utf-8", errors="replace"), url
-    raise RecipeNotFound("Couldn't import that — too many redirects.")
+    raise RecipeNotFound("Couldn't import that: too many redirects.")
 
 
 async def import_recipe(

@@ -7,9 +7,9 @@ from fractions import Fraction
 from kitchen_companion.recipes.model import Ingredient, Recipe
 from kitchen_companion.recipes.units import COUNT_UNITS, number_words, round_kitchen, speak_quantity
 
-NO_RECIPE = "No recipe loaded yet — pick one on the screen or ask me to find one."
+NO_RECIPE = "No recipe loaded yet. Pick one on the screen or ask me to find one."
 NO_STEPS = "This recipe has no steps."
-LAST_STEP = "That was the last step — enjoy!"
+LAST_STEP = "That was the last step. Enjoy!"
 FIRST_STEP = "We're at the first step. "
 
 COOKING_VERBS = {
@@ -64,9 +64,9 @@ class RecipeSession:
         self.pending_timer_offer = None
         n = len(recipe.steps)
         if n == 0:
-            return f"Okay — {recipe.title}. {NO_STEPS}"
+            return f"Okay, {recipe.title}. {NO_STEPS}"
         count = "One step" if n == 1 else f"{number_words(n).capitalize()} steps"
-        return f"Okay — {recipe.title}. {count}. " + self.current()
+        return f"Okay, {recipe.title}. {count}. " + self.current()
 
     def _guard(self) -> str | None:
         if self.recipe is None:

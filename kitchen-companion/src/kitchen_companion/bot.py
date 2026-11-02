@@ -64,7 +64,7 @@ from kitchen_companion.tools import ToolHandlers, tool_schemas
 
 logger = logging.getLogger(__name__)
 
-APOLOGY = "Sorry, I lost my train of thought — try that again?"
+APOLOGY = "Sorry, I lost my train of thought. Try that again?"
 LLM_TIMEOUT_S = 8.0
 MAX_KEYTERMS = 50
 # How long a timer announcement waits for the room to go quiet before speaking anyway.

@@ -129,7 +129,7 @@ async def test_router_cancel_ambiguous_asks(rig):  # Review Focus 4
         frames_to_send=[tf("cancel the timer")],
         expected_down_frames=[TTSSpeakFrame, LLMMessagesAppendFrame],
     )
-    assert down[0].text == "Which timer — pasta or sauce?" and len(rig.timers.list()) == 2
+    assert down[0].text == "Which timer, pasta or sauce?" and len(rig.timers.list()) == 2
 
 
 async def test_router_cancel_named(rig):
@@ -290,7 +290,7 @@ async def test_state_note_starts_context_with_a_user_turn():
     context = LLMContext(
         messages=[
             {"role": "system", "content": "sys"},
-            {"role": "assistant", "content": "Okay — Test. Three steps. Step one: Whisk the flour."},
+            {"role": "assistant", "content": "Okay, Test. Three steps. Step one: Whisk the flour."},
             {"role": "user", "content": "how much garlic"},
         ]
     )

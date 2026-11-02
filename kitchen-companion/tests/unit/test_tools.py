@@ -59,7 +59,9 @@ async def test_convert_units_impossible_is_error_not_exception(rig):
     out = await rig.h.convert_units(
         {"quantity": 1, "from_unit": "cups", "to_unit": "grams", "ingredient": "spinach"}
     )
-    assert out == {"error": "I can't convert cups of spinach to grams reliably — roughly a handful per cup."}
+    assert out == {
+        "error": "I can't convert cups of spinach to grams reliably, but it's roughly a handful per cup."
+    }
 
 
 async def test_convert_units_with_density(rig):
@@ -88,7 +90,7 @@ async def test_convert_units_unknown_unit(rig):
 
 async def test_load_recipe_calls_hook_and_emits_state(rig):
     out = await rig.h.load_recipe({"recipe_id": "garlic-butter-pasta"})
-    assert out["say"].startswith("Okay — Garlic Butter Pasta. Seven steps. Step one:")
+    assert out["say"].startswith("Okay, Garlic Butter Pasta. Seven steps. Step one:")
     assert rig.loaded == ["garlic-butter-pasta"]
     assert rig.sink.states[-1]["id"] == "garlic-butter-pasta"
 
@@ -128,7 +130,7 @@ async def test_set_timer_rejects_nonpositive(rig):
 async def test_cancel_and_list_timers(rig):
     await rig.h.set_timer({"minutes": 5, "label": "pasta"})
     await rig.h.set_timer({"minutes": 3, "label": "sauce"})
-    assert (await rig.h.cancel_timer({}))["say"] == "Which timer — pasta or sauce?"
+    assert (await rig.h.cancel_timer({}))["say"] == "Which timer, pasta or sauce?"
     listed = await rig.h.list_timers({})
     assert [t["label"] for t in listed["timers"]] == ["pasta", "sauce"]
     assert listed["say"].startswith("The pasta timer has")

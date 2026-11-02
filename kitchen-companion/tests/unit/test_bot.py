@@ -76,7 +76,7 @@ class ActionRig:
 async def test_client_load_recipe_speaks_intro_and_updates_state():
     rig = ActionRig()
     await rig.actions.handle("load_recipe", {"id": "tomato-soup"})
-    assert rig.spoken[-1].startswith("Okay — Tomato Soup.")
+    assert rig.spoken[-1].startswith("Okay, Tomato Soup.")
     assert rig.loaded == ["tomato-soup"] and rig.sink.states[-1]["id"] == "tomato-soup"
     await rig.actions.handle("load_recipe", {"id": "nope"})
     assert rig.loaded == ["tomato-soup"]

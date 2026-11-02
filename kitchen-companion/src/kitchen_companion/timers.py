@@ -218,7 +218,7 @@ def cancel_reply(service: TimerService, label: str | None) -> tuple[str, bool]:
     """The reply to "cancel the (label) timer", and whether a timer was actually cancelled."""
     result = service.cancel(label)
     if result.ambiguous:
-        return "Which timer — " + " or ".join(result.ambiguous) + "?", False
+        return "Which timer, " + " or ".join(result.ambiguous) + "?", False
     if not result.cancelled:
         if label and service.list():
             return f"I don't see {the_timer(label)}.", False

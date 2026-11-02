@@ -256,9 +256,9 @@ export function recipeFromBundle(data) {
 
 // -- recipes/state.py ----------------------------------------------------------------------------
 
-const NO_RECIPE = "No recipe loaded yet — pick one on the screen or ask me to find one.";
+const NO_RECIPE = "No recipe loaded yet. Pick one on the screen or ask me to find one.";
 const NO_STEPS = "This recipe has no steps.";
-const LAST_STEP = "That was the last step — enjoy!";
+const LAST_STEP = "That was the last step. Enjoy!";
 const FIRST_STEP = "We're at the first step. ";
 
 const COOKING_VERBS = new Set([
@@ -297,9 +297,9 @@ export class RecipeSession {
     this.scale = new Frac(1);
     this.pendingTimerOffer = null;
     const n = recipe.steps.length;
-    if (n === 0) return `Okay — ${recipe.title}. ${NO_STEPS}`;
+    if (n === 0) return `Okay, ${recipe.title}. ${NO_STEPS}`;
     const count = n === 1 ? "One step" : `${sentence(numberWords(n))} steps`;
-    return `Okay — ${recipe.title}. ${count}. ` + this.current();
+    return `Okay, ${recipe.title}. ${count}. ` + this.current();
   }
 
   guard() {
@@ -524,7 +524,7 @@ export const startedReply = (timer) =>
 
 export function cancelReply(service, label) {
   const result = service.cancel(label);
-  if (result.ambiguous.length) return ["Which timer — " + result.ambiguous.join(" or ") + "?", false];
+  if (result.ambiguous.length) return ["Which timer, " + result.ambiguous.join(" or ") + "?", false];
   if (!result.cancelled.length) {
     if (label && service.list().length) return [`I don't see ${theTimer(label)}.`, false];
     return ["There's no timer running.", false];

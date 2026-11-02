@@ -147,9 +147,8 @@ class ToolHandlers:
                     "error": f"I can't convert {unit_name(src)} to {unit_name(dst)} without knowing "
                     "the ingredient."
                 }
-            hint = (
-                " — roughly a handful per cup" if any(leaf in ingredient.lower() for leaf in _LEAFY) else ""
-            )
+            leafy = any(leaf in ingredient.lower() for leaf in _LEAFY)
+            hint = ", but it's roughly a handful per cup" if leafy else ""
             return {
                 "error": f"I can't convert {unit_name(src)} of {ingredient} to {unit_name(dst)} "
                 f"reliably{hint}."

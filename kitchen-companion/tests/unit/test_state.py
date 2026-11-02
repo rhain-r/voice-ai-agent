@@ -35,7 +35,7 @@ def session() -> RecipeSession:
 def test_load_and_navigate():
     s = RecipeSession()
     intro = s.load(make_recipe())
-    assert intro == "Okay — Test Pancakes. Three steps. Step one: Whisk the flour and eggs."
+    assert intro == "Okay, Test Pancakes. Three steps. Step one: Whisk the flour and eggs."
     assert s.index == 0
     assert s.next().startswith("Step two: Simmer")
     assert s.index == 1
@@ -47,7 +47,7 @@ def test_load_and_navigate():
 
 def test_next_at_end_message(session):
     session.goto(3)
-    assert session.next() == "That was the last step — enjoy!"
+    assert session.next() == "That was the last step. Enjoy!"
     assert session.index == 2
 
 
@@ -64,7 +64,7 @@ def test_goto_out_of_range(session):
 
 def test_no_recipe_message():
     s = RecipeSession()
-    assert NO_RECIPE == "No recipe loaded yet — pick one on the screen or ask me to find one."
+    assert NO_RECIPE == "No recipe loaded yet. Pick one on the screen or ask me to find one."
     for say in (s.next(), s.prev(), s.repeat(), s.current(), s.goto(2), s.scale_to(2)):
         assert say == NO_RECIPE
     assert s.ingredient("flour").text == NO_RECIPE
